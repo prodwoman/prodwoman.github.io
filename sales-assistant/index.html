@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Sales Assistant · MVP by Divya Singh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f3f2f0;--paper:#fff;--ink:#121316;--ink2:#3b3d44;--muted:#73767e;--line:#e4e2de;--blue:#2536d4;--soft:#e9ebfb;
+    --hot:#d63b2f;--hotbg:#fde7e4;--warm:#b26b00;--warmbg:#fff1d6;--cold:#56606e;--coldbg:#eceef1;
+    --sans:"Inter Tight",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--blue);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px}
+  .brand small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);letter-spacing:0}
+  .ai-state{font-family:var(--mono);font-size:12px;padding:6px 11px;border-radius:999px;background:var(--coldbg);color:var(--cold)}
+  .ai-state.on{background:#dcf5e5;color:#127a3c}
+  .btn{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.ghost{border-color:var(--line)}
+  .btn:disabled{opacity:.5;cursor:default}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 24px 0}
+  .kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .kpi b{font-size:28px;font-weight:800;letter-spacing:-.03em;display:block;line-height:1.1}
+  .kpi span{color:var(--muted);font-size:13px}
+  .kpi.alert b{color:var(--hot)}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;padding:18px 24px 30px;align-items:start}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .ph{display:flex;gap:10px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .ph h2{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-right:auto}
+  .ph input,.ph select{border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--bg);font-size:14px}
+  .ph input{min-width:160px}
+  .list{max-height:calc(100vh - 250px);min-height:420px;overflow:auto}
+  .lead{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;width:100%;text-align:left;background:none;border-left:3px solid transparent;border-right:0;border-top:0}
+  .lead:hover{background:#faf9f7}
+  .lead.sel{background:var(--soft);border-left-color:var(--blue)}
+  .score{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .score.hot{background:var(--hotbg);color:var(--hot)} .score.warm{background:var(--warmbg);color:var(--warm)} .score.cold{background:var(--coldbg);color:var(--cold)}
+  .lead .nm{font-weight:700}
+  .lead .sub{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lead .rt{text-align:right;font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .lead .rt b{display:block;color:var(--ink);font-size:14px}
+  .chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--ink2);margin-right:4px}
+  .chip.stale{background:var(--hotbg);color:var(--hot)}
+  .empty{padding:40px;text-align:center;color:var(--muted)}
+
+  .detail{padding:20px}
+  .detail h3{font-size:24px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+  .detail .meta{color:var(--muted);margin-top:4px}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+  .fact{background:var(--bg);border-radius:10px;padding:10px 12px}
+  .fact span{display:block;font-size:12px;color:var(--muted)}
+  .fact b{font-size:14.5px}
+  .why{font-size:13.5px;color:var(--ink2);background:var(--bg);border-radius:10px;padding:10px 12px}
+  .why li{margin-left:18px}
+  .sec{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px}
+  .timeline{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}
+  .tl{position:relative;padding:4px 0 10px;font-size:14px}
+  .tl::before{content:"";position:absolute;left:-20px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--blue)}
+  .tl small{color:var(--muted);font-family:var(--mono);font-size:11.5px;display:block}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .ai-box{margin-top:12px;border:1.5px solid var(--soft);background:#f7f8fe;border-radius:12px;padding:14px;font-size:14.5px;white-space:pre-wrap;display:none}
+  .ai-box.show{display:block}
+  .ai-box .lbl{font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;white-space:normal}
+  .ai-box textarea{width:100%;min-height:200px;border:0;background:transparent;resize:vertical;line-height:1.5}
+  .ai-box .row{display:flex;gap:8px;margin-top:8px;white-space:normal}
+
+  .modal{position:fixed;inset:0;background:rgba(18,19,22,.45);display:none;place-items:center;padding:20px;z-index:50}
+  .modal.show{display:grid}
+  .dialog{background:var(--paper);border-radius:18px;max-width:620px;width:100%;padding:24px;max-height:90vh;overflow:auto}
+  .dialog h3{font-size:21px;font-weight:800;letter-spacing:-.02em}
+  .dialog p{color:var(--muted);margin:6px 0 14px}
+  .dialog textarea{width:100%;min-height:170px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .grid2 label{font-size:12.5px;color:var(--muted)}
+  .grid2 input,.grid2 select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:3px}
+  .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+  .toast.show{opacity:1}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .7s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .badge{background:var(--hot);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-family:var(--mono)}
+  .badge:empty{display:none}
+  .kind{font-family:var(--mono);font-size:10.5px;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:1px}
+  .kind.gmail{background:#e8f0fe;color:#1a56c4} .kind.manual{background:var(--bg);color:var(--ink2)}
+  .sync-item{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
+  .sync-item .from{font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+  .sync-item .subj{font-weight:700;margin-top:2px}
+  .sync-item .body{color:var(--ink2);font-size:14px;margin-top:4px}
+  .sync-item .res{margin-top:10px;font-size:13.5px;background:var(--bg);border-radius:8px;padding:9px 11px}
+  .sync-item .res b{color:#127a3c}
+  .sync-item .sug{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+  .sync-item.skip{opacity:.6}
+  .today{margin:18px 24px 0;background:var(--ink);color:#fff;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .today .tx{flex:1;min-width:260px}
+  .today .tk{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#8f9bff}
+  .today .th{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:4px;line-height:1.25}
+  .today .btn.primary{padding:12px 20px;font-size:15px}
+  .today .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .today .chips button{background:#24262c;border:1px solid #34363e;color:#d6d7dc;border-radius:999px;padding:5px 12px;font-size:13px}
+  .today .chips button.on{background:#fff;color:var(--ink)}
+  .today .prog{font-size:13px;color:#a3a5ad}
+  .nx{font-size:13px;color:var(--blue);font-weight:600;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lead.done .nx{color:#127a3c}
+  .nextcard{background:var(--soft);border-radius:14px;padding:18px;margin-top:16px}
+  .nextcard .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+  .nextcard .t{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+  .nextcard .w{color:var(--ink2);font-size:14.5px;margin-top:4px}
+  .nextcard .btn.primary{margin-top:14px;padding:12px 20px;font-size:15px}
+  .nextcard.donecard{background:#dcf5e5}
+  .nextcard.donecard .k{color:#127a3c}
+  .more{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:14px}
+  .more button,.more select{background:none;border:0;color:var(--ink2);text-decoration:underline;text-underline-offset:3px;padding:0;font-size:14px}
+  details.why{margin-top:14px}
+  details.why summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--ink2)}
+  .sumcard{margin-top:18px;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .sumcard .sk{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .sumcard .lnk{background:none;border:0;color:var(--blue);font-family:var(--sans);font-size:13px;letter-spacing:0;text-transform:none;text-decoration:underline;text-underline-offset:3px}
+  .sumcard p{margin-top:12px;font-size:14.5px;line-height:1.55;color:var(--ink2)}
+  .facts5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+  .facts5 div{background:var(--bg);border-radius:8px;padding:7px 9px;min-width:0}
+  .facts5 span{display:block;font-size:11px;color:var(--muted)}
+  .facts5 b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  @media(max-width:1200px){.facts5{grid-template-columns:repeat(3,1fr)}}
+  .note{padding:0 24px 24px;color:var(--muted);font-size:12.5px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.list{max-height:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo">AI</div><div>AI Sales Assistant<small>Your leads, ranked, with the next step ready</small></div></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button class="btn ghost" id="syncBtn">↻ Sync Gmail <span class="badge" id="syncCount"></span></button>
+    <button class="btn ghost" id="captureBtn">+ Add lead</button>
+  </div>
+</header>
+
+<section class="today" id="today"></section>
+
+<section class="layout">
+  <div class="panel">
+    <div class="ph">
+      <h2>Leads, most urgent first</h2>
+      <input id="q" placeholder="Search company or contact">
+
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+  <div class="panel" id="detail"></div>
+</section>
+<p class="note"><span id="gmailState">Gmail: connected, tracking received and sent mail (sample inbox)</span> · <span id="aiState">AI: checking…</span> · <a href="#" id="resetBtn" style="color:inherit">Reset demo</a><br>MVP prototype by Divya Singh. All leads are sample data. Scoring rules are transparent and shown on each lead; Gmail is simulated with a sample inbox. Follow-up drafts and email capture use Claude when available, otherwise built-in templates.</p>
+
+<div class="modal" id="modal">
+  <div class="dialog">
+    <h3>Add a lead manually</h3>
+    <p>For leads that did not come through Gmail (a call, WhatsApp, an event). Paste the details or an email and the assistant fills in the fields for you to check.</p>
+    <textarea id="emailIn"></textarea>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="sampleEmail">Use a sample email</button>
+      <button class="btn primary" id="extractBtn">Extract details</button>
+    </div>
+    <div class="grid2" id="extracted" style="display:none">
+      <div><label>Company</label><input id="xCompany"></div>
+      <div><label>Contact</label><input id="xContact"></div>
+      <div><label>Role</label><input id="xRole"></div>
+      <div><label>Interest</label><input id="xInterest"></div>
+      <div><label>Est. deal size (INR lakh)</label><input id="xValue" type="number" min="0"></div>
+      <div><label>Learners</label><input id="xSeats" type="number" min="0"></div>
+    </div>
+    <div class="foot">
+      <button class="btn ghost" id="cancelBtn">Cancel</button>
+      <button class="btn primary" id="addBtn" disabled>Add to inbox</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="syncModal">
+  <div class="dialog">
+    <h3>Gmail sync</h3>
+    <p>Emails you receive and emails you send are both matched to leads by domain and logged automatically. Changes to stage or deal size are suggested, never applied without you.</p>
+    <div id="syncList"></div>
+    <div class="foot"><button class="btn primary" id="syncDone">Done</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DAY = 864e5, now = Date.now();
+const fmtDate = t => new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+const ago = d => now - d*DAY;
+const SEED = () => [
+  {id:1, company:"Northwind Logistics", contact:"Priya Menon", role:"Head of L&D", source:"Email", interest:"Leadership programme for 40 managers", value:24, seats:40, stage:"Proposal sent",
+    events:[[ago(16),"Enquiry received by email"],[ago(12),"Discovery call, 30 min"],[ago(9),"Proposal sent, INR 24 lakh"]]},
+  {id:2, company:"Apex Fintech", contact:"Rahul Khanna", role:"CHRO", source:"Event", interest:"AI for managers, cohort of 60", value:36, seats:60, stage:"Discovery",
+    events:[[ago(3),"Met at HR Leaders Summit, Mumbai"],[ago(2),"Asked for a programme outline"]]},
+  {id:3, company:"Greenfield Pharma", contact:"Sneha Iyer", role:"L&D Manager", source:"Sheet", interest:"Sales capability workshop", value:8, seats:25, stage:"New",
+    events:[[ago(21),"Added from regional sales sheet"]]},
+  {id:4, company:"Orbit Retail", contact:"Vikram Rao", role:"VP People", source:"Web form", interest:"Digital transformation programme", value:30, seats:50, stage:"Negotiation",
+    events:[[ago(25),"Web form enquiry"],[ago(18),"Discovery call"],[ago(10),"Proposal sent"],[ago(1),"Asked for 10% discount on 50 seats"]]},
+  {id:5, company:"Bluewave Telecom", contact:"Anita Desai", role:"Talent Head", source:"Email", interest:"First-time managers programme", value:15, seats:30, stage:"Discovery",
+    events:[[ago(11),"Enquiry received by email"],[ago(8),"Discovery call"]]},
+  {id:6, company:"Crest Infra", contact:"Manoj Pillai", role:"HR Business Partner", source:"Sheet", interest:"Project management certification", value:6, seats:20, stage:"New",
+    events:[[ago(34),"Added from last quarter's sheet"]]},
+  {id:7, company:"Lumen Health", contact:"Dr. Kavya Nair", role:"COO", source:"Web form", interest:"Hospital operations leadership", value:18, seats:24, stage:"Proposal sent",
+    events:[[ago(6),"Web form enquiry"],[ago(4),"Discovery call"],[ago(2),"Proposal sent"]]},
+  {id:8, company:"Quanta Software", contact:"Arjun Sethi", role:"Engineering Director", source:"Event", interest:"Product management for engineers", value:20, seats:30, stage:"New",
+    events:[[ago(5),"Met at SaaSBoomi meetup"]]},
+  {id:9, company:"Harbor Foods", contact:"Meera Joshi", role:"L&D Lead", source:"Email", interest:"Negotiation skills workshop", value:4, seats:15, stage:"Discovery",
+    events:[[ago(14),"Enquiry received by email"],[ago(13),"Sent brochure"]]},
+  {id:10, company:"Vertex Auto", contact:"Sanjay Kulkarni", role:"Plant HR Head", source:"Sheet", interest:"Supervisor development, 2 plants", value:28, seats:80, stage:"Discovery",
+    events:[[ago(9),"Added from sales sheet"],[ago(7),"Intro call"]]}
+];
+const DOMAINS = {1:"northwind.in",2:"apexfin.com",3:"greenfieldpharma.com",4:"orbitretail.in",5:"bluewavetel.com",6:"crestinfra.com",7:"lumenhealth.in",8:"quanta.dev",9:"harborfoods.in",10:"vertexauto.com"};
+const DETAILS = {
+  1:{spoc:"Priya Menon, Head of L&D", pitched:["Leadership programme","1:1 coaching add-on"], intros:[{name:"Arvind Shah",role:"CFO",by:"Priya",at:10}], quote:{value:24,seats:40,at:9}},
+  2:{spoc:"Rahul Khanna, CHRO", pitched:["AI for managers"], intros:[{name:"Neha Gupta",role:"L&D Manager",by:"Rahul",at:2}], promise:{due:3,said:1,note:"Rahul will share cohort dates after an internal review"}},
+  3:{spoc:"Sneha Iyer, L&D Manager", pitched:["Sales capability workshop"]},
+  4:{spoc:"Vikram Rao, VP People", pitched:["Digital transformation programme","Leadership masterclass"], intros:[{name:"Deepa Nair",role:"Procurement Head",by:"Vikram",at:12}], quote:{value:30,seats:50,at:10}},
+  5:{spoc:"Anita Desai, Talent Head", pitched:["First-time managers programme"]},
+  6:{spoc:"Manoj Pillai, HR Business Partner", pitched:["Project management certification"], promise:{due:-6,said:20,note:"They are closing their quarterly calendar and will get back for the next round of meetings"}},
+  7:{spoc:"Dr. Kavya Nair, COO", pitched:["Hospital operations leadership"], intros:[{name:"Rohit Bansal",role:"Head of Nursing Operations",by:"Kavya",at:4}], quote:{value:18,seats:24,at:2}, promise:{due:5,said:1,note:"They are closing their quarterly calendar and will get back for the next round of meetings"}},
+  8:{spoc:"Arjun Sethi, Engineering Director", pitched:["Product management for engineers"]},
+  9:{spoc:"Meera Joshi, L&D Lead", pitched:["Negotiation skills workshop"]},
+  10:{spoc:"Sanjay Kulkarni, Plant HR Head", pitched:["Supervisor development programme"], intros:[{name:"Ramesh Iyer",role:"Plant Head, Pune",by:"Sanjay",at:6}]}
+};
+function seed(){ return SEED().map(l=>{
+  const d = DETAILS[l.id]||{}, ev = l.events.map(e=>[e[0],e[1],/by email/i.test(e[1])?"in":/proposal sent|sent brochure/i.test(e[1])?"out":"manual"]);
+  (d.intros||[]).forEach(i=>ev.push([ago(i.at),`${i.by} introduced ${i.name}, ${i.role}`,"in"]));
+  if(d.promise) ev.push([ago(d.promise.said),`${d.promise.note} (will get back by ${fmtDate(ago(-d.promise.due))})`,"in"]);
+  return {...l, domain:DOMAINS[l.id], spoc:d.spoc||`${l.contact}, ${l.role}`, pitched:d.pitched||[l.interest], intros:d.intros||[], quote:d.quote||null,
+    promise:d.promise?{due:ago(-d.promise.due), said:ago(d.promise.said), note:d.promise.note}:null, events:ev};
+}); }
+const GMAIL_QUEUE = () => [
+  {dir:"in", from:"priya.menon@northwind.in", subj:"Re: Leadership programme proposal", body:"We reviewed the proposal internally. Leadership wants to include 45 managers instead of 40. Can we meet Thursday to finalise?",
+   log:"Email from Priya: wants 45 managers, asks to meet Thursday", sug:{stage:"Negotiation", seats:45, value:27, text:"Move to Negotiation, update to 45 learners (INR 27L)"}},
+  {dir:"in", from:"anita.desai@bluewavetel.com", subj:"Budget approved", body:"Good news, the budget for the first-time managers programme is approved. Please send a formal proposal.",
+   log:"Email from Anita: budget approved, proposal requested", sug:{stage:"Proposal sent", text:"Proposal requested: move to Proposal sent once you send it"}},
+  {dir:"in", from:"rohan.mehta@zenithpay.in", subj:"Product management programme enquiry", body:"I'm Rohan Mehta, Head of Learning at Zenith Payments. We're planning a product management programme for about 35 of our engineers this quarter, budget roughly INR 21 lakh.",
+   newLead:true},
+  {dir:"out", to:"sanjay.kulkarni@vertexauto.com", subj:"Programme outline: supervisor development", body:"Hi Sanjay, sharing the outline for the two-plant supervisor programme as discussed. Happy to walk you through it this week.",
+   log:"You sent the programme outline"},
+  {dir:"out", to:"meera.joshi@harborfoods.in", at:5, subj:"Negotiation skills workshop: dates", body:"Hi Meera, following up with two possible dates for the workshop. Let me know which suits your team.",
+   log:"You sent workshop dates"},
+  {dir:"in", from:"manoj.pillai@crestinfra.com", subj:"Automatic reply: Out of office", body:"I am out of office until Monday with limited access to email.", skip:"Auto-reply detected, not logged"}
+];
+let gmailQueue = GMAIL_QUEUE();
+let leads = seed(), selId = null, sample = null, nextId = 100;
+
+/* ---- Scoring: transparent rules, 0-100 ---- */
+const STAGE_PTS = {"New":5,"Discovery":12,"Proposal sent":20,"Negotiation":25};
+function lastTouch(l){ return Math.max(...l.events.map(e=>e[0])); }
+function daysSince(t){ return Math.max(0, Math.floor((Date.now() - t)/DAY)); }
+function score(l){
+  const d = daysSince(lastTouch(l)), why = [];
+  const v = Math.min(30, Math.round(l.value)); why.push(`Deal size INR ${l.value}L: +${v}`);
+  const s = STAGE_PTS[l.stage]||0; why.push(`Stage "${l.stage}": +${s}`);
+  const r = d<=2?25:d<=7?18:d<=14?8:0; why.push(`Last touch ${d}d ago: +${r}`);
+  const e = Math.min(20, (l.events.length-1)*5); why.push(`${l.events.length} interactions: +${e}`);
+  const em = emailState(l), o = em.s==="owe"?10:0; if(o) why.push(`Waiting on your reply: +${o}`);
+  const total = Math.min(100, v+s+r+e+o);
+  return {total, why, d, tier: total>=60?"hot":total>=40?"warm":"cold", stale: d>7 && l.stage!=="Won"};
+}
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $ = id => document.getElementById(id);
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+
+function handledToday(l){ const t=new Date(); t.setHours(0,0,0,0); return l.events.some(e=>e[0]>=t.getTime() && (e[2]==="manual"||e[2]==="out")); }
+function emailState(l){ const ins=l.events.filter(e=>e[2]==="in" && !/introduced|will get back by/.test(e[1])).map(e=>e[0]), outs=l.events.filter(e=>e[2]==="out").map(e=>e[0]); const li=ins.length?Math.max(...ins):0, lo=outs.length?Math.max(...outs):0; if(li && li>lo) return {s:"owe", d:daysSince(li)}; if(lo && lo>li) return {s:"waiting", d:daysSince(lo)}; return {s:"none"}; }
+function lastIn(l){ const e=l.events.filter(x=>x[2]==="in").sort((a,b)=>b[0]-a[0])[0]; return e?e[1]:""; }
+function nextStep(l){
+  const s = score(l), first = l.contact.replace("Dr. ","").split(" ")[0];
+  if(l.stage==="Won"||l.stage==="Lost") return {t:"No action needed", w:`This deal is ${l.stage.toLowerCase()}.`, a:null};
+  const em = emailState(l);
+  const pr = l.promise && !l.events.some(e=>e[2]==="in" && e[0]>l.promise.said+1000) ? l.promise : null;
+  if(pr && pr.due < Date.now()) return {t:`Follow up with ${first}`, w:`They promised to get back by ${fmtDate(pr.due)}. That date has passed.`, a:"draft", b:"Draft a follow-up"};
+  if(em.s==="owe") return {t:`Reply to ${first}`, w:`They emailed ${em.d===0?'today':em.d+' days ago'} and are waiting on you.`, a:"draft", b:"Draft the reply"};
+  if(l.stage==="Negotiation") return {t:`Reply to ${first} on pricing`, w:"They are close to signing and waiting on your offer.", a:"draft", b:"Draft the reply"};
+  if(pr) return {t:`Wait for ${first} until ${fmtDate(pr.due)}`, w:`${pr.note}. I will remind you if nothing comes by then.`, a:null};
+  if(em.s==="waiting" && em.d>=4) return {t:`Nudge ${first}`, w:`No reply to your email in ${em.d} days.`, a:"draft", b:"Draft a nudge"};
+  if(em.s==="waiting" && em.d<4) return {t:`Wait for ${first}'s reply`, w:`You emailed ${em.d===0?'today':em.d+' days ago'}. Nudge if nothing by day 4.`, a:null};
+  if(s.stale) return {t:`Re-engage ${first}`, w:`No contact for ${s.d} days on an INR ${l.value}L deal.`, a:"draft", b:"Draft a follow-up"};
+  if(l.stage==="Proposal sent") return {t:`Book a proposal walkthrough with ${first}`, w:"Keep the decision moving while the proposal is fresh.", a:"draft", b:"Draft the email"};
+  if(l.stage==="Discovery") return {t:`Send ${first} a programme outline`, w:`${l.seats} learners: ${l.interest.toLowerCase()}.`, a:"draft", b:"Draft the email"};
+  return {t:`Call ${first} to qualify`, w:"Confirm budget, timing and who decides.", a:"call", b:"Log the call"};
+}
+let filter = "";
+function renderKpis(){
+  const sc = leads.map(l=>({l,s:score(l)}));
+  const hot = sc.filter(x=>x.s.tier==="hot"), stale = sc.filter(x=>x.s.stale);
+  const todo = sc.filter(x=>!handledToday(x.l) && x.l.stage!=="Won" && x.l.stage!=="Lost").sort((a,b)=>b.s.total-a.s.total);
+  let k, h, btn;
+  if(gmailQueue.length){ k="Start here"; h=`${gmailQueue.length} new emails in Gmail, received and sent. Sync them first so every lead is up to date.`; btn=`<button class="btn primary" id="todayGo">Sync ${gmailQueue.length} emails</button>`; }
+  else if(todo.length){ const top=todo[0], n=nextStep(top.l); k=`Next up · ${todo.length} leads to work today`; h=`${esc(n.t)} at ${esc(top.l.company)}.`; btn=`<button class="btn primary" id="todayGo" data-id="${top.l.id}">Open ${esc(top.l.company)}</button>`; }
+  else { k="All done"; h="Every lead has been worked today. Nice."; btn=""; }
+  const handled = leads.filter(handledToday).length;
+  $("today").innerHTML = `<div class="tx"><div class="tk">${k}</div><div class="th">${h}</div>
+    <div class="chips">
+      <button data-f="" class="${filter===''?'on':''}">All ${leads.length}</button>
+      <button data-f="reply" class="${filter==='reply'?'on':''}">Needs reply ${leads.filter(l=>emailState(l).s==="owe").length}</button>
+      <button data-f="hot" class="${filter==='hot'?'on':''}">Hot ${hot.length}</button>
+      <button data-f="stale" class="${filter==='stale'?'on':''}">Going stale ${stale.length}</button>
+    </div></div>
+    <div style="text-align:right">${btn}<div class="prog" style="margin-top:8px">${handled} worked today · INR ${leads.reduce((a,l)=>a+l.value,0)}L pipeline</div></div>`;
+  const g=$("todayGo"); if(g) g.onclick = ()=>{ if(gmailQueue.length) runSync(); else { selId=+g.dataset.id; renderAll(); } };
+  $("today").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ filter=b.dataset.f; renderAll(); });
+}
+function renderList(){
+  const q = $("q").value.toLowerCase();
+  const rows = leads.map(l=>({l,s:score(l)}))
+    .filter(({l,s})=>(!q || (l.company+" "+l.contact).toLowerCase().includes(q)) && (!filter || (filter==="stale"?s.stale:filter==="reply"?emailState(l).s==="owe":s.tier===filter)))
+    .sort((a,b)=> (handledToday(a.l)-handledToday(b.l)) || (b.s.total-a.s.total));
+  $("list").innerHTML = rows.length ? rows.map(({l,s})=>{ const d=handledToday(l), n=nextStep(l); return `
+    <button class="lead ${l.id===selId?'sel':''} ${d?'done':''}" data-id="${l.id}">
+      <div class="score ${s.tier}">${s.total}</div>
+      <div style="min-width:0"><div class="nm">${esc(l.company)}${emailState(l).s==="owe"?' <span class="chip" style="background:#e8f0fe;color:#1a56c4">Needs reply</span>':''}${s.stale?' <span class="chip stale">Going stale</span>':''}</div>
+        <div class="nx">${d?'✓ Worked today':'→ '+esc(n.t)}</div></div>
+      <div class="rt"><b>INR ${l.value}L</b>${s.d===0?'today':s.d+'d ago'}</div>
+    </button>`;}).join("") : `<div class="empty">No leads here.</div>`;
+}
+function renderDetail(){
+  const l = leads.find(x=>x.id===selId);
+  if(!l){ $("detail").innerHTML = `<div class="empty" style="padding:80px 30px">Pick a lead on the left. The top one needs you most.</div>`; return; }
+  const s = score(l), n = nextStep(l), d = handledToday(l);
+  const nextLead = leads.filter(x=>x.id!==l.id && !handledToday(x) && x.stage!=="Won" && x.stage!=="Lost").sort((a,b)=>score(b).total-score(a).total)[0];
+  $("detail").innerHTML = `<div class="detail">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+      <div><h3>${esc(l.company)}</h3><div class="meta">${esc(l.contact)}, ${esc(l.role)} · ${esc(l.stage)} · INR ${l.value}L, ${l.seats} learners</div></div>
+      <div class="score ${s.tier}" style="width:54px;height:54px;font-size:19px">${s.total}</div>
+    </div>
+    ${d ? `<div class="nextcard donecard"><div class="k">Done for today</div><div class="t">${esc(l.company)} is up to date.</div>
+        ${nextLead?`<button class="btn primary" id="nextLeadBtn">Next: ${esc(nextLead.company)} →</button>`:'<div class="w">That was the last lead. All done for today.</div>'}</div>`
+      : `<div class="nextcard"><div class="k">Your next step</div><div class="t">${esc(n.t)}</div><div class="w">${esc(n.w)}</div>
+        ${n.a?`<button class="btn primary" id="mainAct">${esc(n.b)}</button>`:""}</div>`}
+    <div class="ai-box" id="aiBox"></div>
+    <div class="more">
+      <button id="touchBtn">Log a call</button>
+      <button id="noteBtn">Add a note</button>
+      <button id="nbaBtn">Ask AI for another idea</button>
+      <select id="stageSel" aria-label="Change stage">${Object.keys(STAGE_PTS).concat(["Won","Lost"]).map(st=>`<option ${st===l.stage?'selected':''}>${st===l.stage?'Stage: '+st:st}</option>`).join("")}</select>
+    </div>
+    <div class="sumcard"><div class="sk">Deal so far <button class="lnk" id="sumAi">Rewrite with AI</button></div>
+      <div class="facts5">${summaryFacts(l).map(f=>`<div><span>${f[0]}</span><b>${esc(f[1])}</b></div>`).join("")}</div>
+      <p id="sumText">${esc(dealSummary(l))}</p></div>
+    <details class="why"><summary>Why it scores ${s.total}</summary><div class="why" style="margin-top:8px"><ul>${s.why.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div></details>
+    <div class="sec">Timeline</div>
+    <div class="timeline">${[...l.events].sort((a,b)=>b[0]-a[0]).map(e=>`<div class="tl"><small>${fmtDate(e[0])}${e[2]==="in"?'<span class="kind gmail">↙ Gmail · received</span>':e[2]==="out"?'<span class="kind gmail">↗ Gmail · sent</span>':'<span class="kind manual">Manual</span>'}</small>${esc(e[1])}</div>`).join("")}</div>
+  </div>`;
+  const m=$("mainAct"); if(m) m.onclick = ()=> n.a==="draft" ? draft(l) : logCall(l);
+  const nb=$("nextLeadBtn"); if(nb) nb.onclick = ()=>{ selId=nextLead.id; renderAll(); };
+  $("nbaBtn").onclick = ()=>nba(l);
+  $("sumAi").onclick = ()=>aiSummary(l);
+  $("touchBtn").onclick = ()=>logCall(l);
+  $("noteBtn").onclick = ()=>{
+    const b = showBox("Add a note", `<textarea id="noteTxt" style="min-height:80px" placeholder="e.g. Spoke on WhatsApp, decision expected next week"></textarea><div class="row"><button class="btn primary" id="saveNote">Save note</button></div>`);
+    $("noteTxt").focus();
+    $("saveNote").onclick = ()=>{ const v=$("noteTxt").value.trim(); if(!v) return; l.events.push([Date.now(),v,"manual"]); toast("Note saved"); renderAll(); };
+  };
+  $("stageSel").onchange = e=>{ l.stage = e.target.value.replace("Stage: ",""); l.events.push([Date.now(),`Stage changed to ${l.stage}`,"manual"]); renderAll(); };
+}
+function dealSummary(l){
+  const ev = [...l.events].sort((a,b)=>a[0]-b[0]);
+  const first = ev[0], call = ev.find(e=>/call/i.test(e[1]));
+  const parts = [];
+  parts.push(`First contact on ${fmtDate(first[0])}: ${first[1].replace(/^./,c=>c.toLowerCase())}.`);
+  if(call) parts.push(`First call on ${fmtDate(call[0])}.`);
+  parts.push(`SPOC is ${l.spoc}.`);
+  parts.push(`Pitched: ${l.pitched.join(" and ")}.`);
+  l.intros.forEach(i=>parts.push(`${i.by} then introduced ${i.name} (${i.role}) on ${fmtDate(ago(i.at))}.`));
+  if(l.quote) parts.push(`Quotation of INR ${l.quote.value} lakh for ${l.quote.seats} learners sent on ${fmtDate(ago(l.quote.at))}.`);
+  const latest = ev[ev.length-1];
+  if(latest!==first && !/introduced|will get back by/.test(latest[1])) parts.push(`Latest (${fmtDate(latest[0])}): ${latest[1]}.`);
+  if(l.promise) parts.push(l.promise.due<Date.now() ? `They said they would get back by ${fmtDate(l.promise.due)}; that date has passed.` : `They said they will get back by ${fmtDate(l.promise.due)} for the next round.`);
+  return parts.join(" ");
+}
+function summaryFacts(l){
+  const call = [...l.events].sort((a,b)=>a[0]-b[0]).find(e=>/call/i.test(e[1]));
+  return [["First call", call?fmtDate(call[0]):"Not yet"],["SPOC", l.spoc.split(",")[0]],["Introduced", l.intros.length?l.intros.map(i=>i.name).join(", "):"None yet"],["Quotation", l.quote?`INR ${l.quote.value}L`:"Not sent"],["Next date", l.promise?fmtDate(l.promise.due):"None set"]];
+}
+async function aiSummary(l){
+  const box=$("sumText"); const btn=$("sumAi"); btn.disabled=true; btn.textContent="Writing…";
+  const prompt = `Write a 4 to 5 sentence deal summary for a B2B sales rep, in plain past tense, covering: when the first call happened, which products were pitched, who the SPOC is, who they introduced, the quotation, and the next agreed date. Use only these facts. No em dashes, no bullet points.\n\nCompany: ${l.company}\nSPOC: ${l.spoc}\nPitched: ${l.pitched.join(", ")}\nIntroductions: ${l.intros.map(i=>i.by+" introduced "+i.name+" ("+i.role+") on "+fmtDate(ago(i.at))).join("; ")||"none"}\nQuotation: ${l.quote?"INR "+l.quote.value+" lakh for "+l.quote.seats+" learners, sent "+fmtDate(ago(l.quote.at)):"none"}\nPromised follow-up: ${l.promise?l.promise.note+", by "+fmtDate(l.promise.due):"none"}\nTimeline:\n${[...l.events].sort((a,b)=>a[0]-b[0]).map(e=>"- "+fmtDate(e[0])+": "+e[1]).join("\n")}`;
+  const t = await ask(prompt, ({text})=>{ box.textContent=text; });
+  if(!t){ box.textContent = dealSummary(l); toast("AI not available here, showing the built-in summary"); }
+  btn.disabled=false; btn.textContent="Rewrite with AI";
+}
+function logCall(l){ l.events.push([Date.now(),"Call logged","manual"]); toast("Call logged"); renderAll(); }
+function renderAll(){ renderKpis(); renderList(); renderDetail(); }
+
+/* ---- AI with template fallback ---- */
+function showBox(label, html){ const b=$("aiBox"); b.className="ai-box show"; b.innerHTML=`<div class="lbl">${label}</div>${html}`; return b; }
+async function ask(prompt, onText){
+  if(!sample) return null;
+  try{ const r = await sample(prompt,{modelTier:"quick",onText}); return r.text; }
+  catch(e){ if(e && e.code==="not_granted"){ sample=null; setAiState(); } return null; }
+}
+function templateEmail(l){
+  const s = score(l), first = l.contact.split(" ").slice(-2)[0].replace("Dr.","").trim()||l.contact;
+  const open = s.stale ? `I wanted to check in, as it has been a little while since we last spoke about ${l.interest.toLowerCase()}.`
+    : `Thank you for your time on ${l.company}'s plans for ${l.interest.toLowerCase()}.`;
+  const ask = {"New":"Would a 20-minute call this week work to understand your goals?","Discovery":"I can share a draft programme outline by Friday. Would a short call to review it work for you?","Proposal sent":"Do you have any questions on the proposal? Happy to walk your team through it this week.","Negotiation":"I have taken your note on pricing to our team and can share a revised option for "+l.seats+" learners. Could we close the details on a call?"}[l.stage] || "Would a short call this week work?";
+  return `Subject: ${l.company} x ${l.interest}: next steps\n\nHi ${first},\n\n${open}\n\n${ask}\n\nBest regards,\nDivya`;
+}
+async function draft(l){
+  const box = showBox("Follow-up draft", `<span class="spin"></span> Drafting…`);
+  const facts = `Company: ${l.company}\nContact: ${l.contact}, ${l.role}\nInterest: ${l.interest}\nDeal: INR ${l.value} lakh, ${l.seats} learners\nStage: ${l.stage}\nDays since last touch: ${score(l).d}\nTimeline:\n${l.events.map(e=>"- "+fmtDate(e[0])+": "+e[1]).join("\n")}`;
+  const prompt = `You are a B2B sales assistant for a corporate learning provider in India. Write a short follow-up email (under 120 words) from Divya to this lead. Start with a "Subject:" line. Be warm, specific to the timeline, and end with one clear ask. No em dashes, no placeholders.\n\n${facts}`;
+  let text = await ask(prompt, ({text})=>{ box.innerHTML = `<div class="lbl">Follow-up draft · Claude</div>${esc(text)}`; });
+  const src = text ? "Claude" : "template";
+  if(!text) text = templateEmail(l);
+  box.innerHTML = `<div class="lbl">Follow-up draft · ${src}</div><textarea id="draftTxt">${esc(text)}</textarea>
+    <div class="row"><button class="btn primary" id="sentBtn">Copy and mark as sent</button></div>`;
+  $("sentBtn").onclick = async ()=>{ try{ await navigator.clipboard.writeText($("draftTxt").value); }catch(e){} l.events.push([Date.now(),"You sent a follow-up","out"]); toast("Copied. Logged as sent"); renderAll(); };
+}
+function templateNba(l){
+  const s = score(l);
+  if(l.stage==="Negotiation") return `Call ${l.contact} today. They asked for a discount, so go in with one revised option (for example, a lower per-seat price for a 2-cohort commitment) rather than a straight cut.`;
+  if(s.stale) return `Re-engage now: ${s.d} days without contact on an INR ${l.value}L opportunity. Send a short follow-up with one new piece of value (a sample module or a client case study), then call in 2 days.`;
+  if(l.stage==="Proposal sent") return `Book a 20-minute proposal walkthrough with ${l.contact} and ask who else signs off, so the decision does not stall.`;
+  if(l.stage==="Discovery") return `Send a one-page programme outline for ${l.seats} learners within 48 hours, while the conversation is fresh.`;
+  return `Qualify it: a 20-minute call to confirm budget, timing and the decision maker.`;
+}
+async function nba(l){
+  const box = showBox("Next best action", `<span class="spin"></span> Thinking…`);
+  const prompt = `You are a sales coach for a B2B corporate learning provider in India. In 2 to 3 sentences, give the single best next action for this lead and why. No em dashes.\n\nCompany: ${l.company}; contact ${l.contact} (${l.role}); interest: ${l.interest}; INR ${l.value} lakh, ${l.seats} learners; stage: ${l.stage}; days since last touch: ${score(l).d}.\nTimeline: ${l.events.map(e=>fmtDate(e[0])+": "+e[1]).join("; ")}`;
+  let text = await ask(prompt, ({text})=>{ box.innerHTML = `<div class="lbl">Next best action · Claude</div>${esc(text)}`; });
+  const src = text ? "Claude" : "rules";
+  box.innerHTML = `<div class="lbl">Next best action · ${src}</div>${esc(text || templateNba(l))}`;
+}
+
+/* ---- Capture from email ---- */
+const SAMPLE_EMAIL = `Hi,
+
+I'm Rohan Mehta, Head of Learning at Zenith Payments. We're planning a product management programme for about 35 of our engineers and analysts this quarter, budget roughly INR 21 lakh.
+
+Could someone share options and timelines?
+
+Thanks,
+Rohan`;
+function regexExtract(t){
+  const company = (t.match(/at ([A-Z][\w&]*(?: [A-Z][\w&]*)*)/)||[])[1]||"";
+  const contact = (t.match(/I'?m ([A-Z][a-z]+ [A-Z][a-z]+)/)||[])[1]||"";
+  const role = (t.match(/I'?m [A-Z][a-z]+ [A-Z][a-z]+, ([^,.]+?) at/)||[])[1]||"";
+  const seats = +((t.match(/(\d+)\s+(?:of our|people|learners|managers|employees|engineers)/)||[])[1]||0);
+  const value = +((t.match(/INR\s*([\d.]+)\s*lakh/i)||[])[1]||0);
+  const interest = (t.match(/planning (?:a |an )?([^.]+?)(?: for| this|\.)/)||[])[1]||"";
+  return {company,contact,role,interest,value,seats};
+}
+async function extract(){
+  const t = $("emailIn").value.trim(); if(!t){ toast("Paste an email first"); return; }
+  const b = $("extractBtn"); b.disabled = true; b.innerHTML = `<span class="spin"></span> Extracting`;
+  let x = null;
+  if(sample){
+    try{ x = await sample.json(`Extract the B2B lead from this email. Return only JSON: {"company":string,"contact":string,"role":string,"interest":string (short),"value":number (INR lakh, 0 if unknown),"seats":number (0 if unknown)}.\n\nEmail:\n${t}`,{modelTier:"quick"}); }
+    catch(e){ x = null; }
+  }
+  if(!x) x = regexExtract(t);
+  $("xCompany").value=x.company||""; $("xContact").value=x.contact||""; $("xRole").value=x.role||"";
+  $("xInterest").value=x.interest||""; $("xValue").value=x.value||0; $("xSeats").value=x.seats||0;
+  $("extracted").style.display="grid"; $("addBtn").disabled=false;
+  b.disabled=false; b.textContent="Extract again";
+}
+function addLead(){
+  const l = {id:nextId++, company:$("xCompany").value||"Unknown company", contact:$("xContact").value||"Unknown", role:$("xRole").value||"", source:"Email",
+    interest:$("xInterest").value||"Not specified", value:+$("xValue").value||0, seats:+$("xSeats").value||0, stage:"New", events:[[Date.now(),"Added manually from a pasted email","manual"]], domain:""};
+  leads.push(l); selId = l.id; closeModal(); renderAll(); toast("Lead added and scored");
+}
+function openModal(){ $("modal").classList.add("show"); $("emailIn").value=""; $("extracted").style.display="none"; $("addBtn").disabled=true; $("extractBtn").textContent="Extract details"; }
+function closeModal(){ $("modal").classList.remove("show"); }
+
+function updateSyncCount(){ const n=gmailQueue.length; $("syncCount").textContent = n?String(n):""; }
+function runSync(){
+  const items = gmailQueue; gmailQueue = []; updateSyncCount();
+  const html = items.length ? items.map((m,i)=>{
+    const addr = m.dir==="out" ? m.to : m.from, dom = addr.split("@")[1], lead = leads.find(l=>l.domain===dom);
+    let res="", sug="";
+    if(m.skip){ res = `${esc(m.skip)}`; }
+    else if(lead){
+      lead.events.push([m.at ? Date.now()-m.at*DAY : Date.now(), m.log, m.dir]);
+      res = m.dir==="out" ? `<b>✓ Logged</b> as sent on ${esc(lead.company)}. Now waiting on their reply.` : `<b>✓ Logged</b> on ${esc(lead.company)}. They are waiting on your reply.`;
+      if(m.sug) sug = `<div class="sug" data-i="${i}" data-lead="${lead.id}">Suggested: ${esc(m.sug.text)} <button class="btn primary" data-act="apply" style="padding:5px 12px">Apply</button><button class="btn ghost" data-act="open" style="padding:5px 12px">Edit manually</button><button class="btn ghost" data-act="ignore" style="padding:5px 12px">Ignore</button></div>`;
+    } else if(m.newLead){
+      res = `No matching lead for <b style="color:var(--ink)">${esc(dom)}</b>.`;
+      sug = `<div class="sug" data-i="${i}">Suggested: create a new lead from this email <button class="btn primary" data-act="create" style="padding:5px 12px">Create lead</button><button class="btn ghost" data-act="ignore" style="padding:5px 12px">Ignore</button></div>`;
+    }
+    return `<div class="sync-item ${m.skip?'skip':''}"><div class="from">${m.dir==="out"?'↗ Sent to '+esc(m.to)+(m.at?' · '+m.at+' days ago':''):'↙ Received from '+esc(m.from)}</div><div class="subj">${esc(m.subj)}</div><div class="body">${esc(m.body)}</div><div class="res">${res}</div>${sug}</div>`;
+  }).join("") : `<div class="empty">Inbox is up to date. No new emails since the last sync.</div>`;
+  $("syncList").innerHTML = html; $("syncList")._items = items;
+  $("syncModal").classList.add("show"); renderAll();
+}
+$("syncList").onclick = e=>{
+  const btn = e.target.closest("[data-act]"); if(!btn) return;
+  const box = btn.closest(".sug"), m = $("syncList")._items[+box.dataset.i], act = btn.dataset.act;
+  if(act==="apply"){ const l=leads.find(x=>x.id===+box.dataset.lead); Object.assign(l, {stage:m.sug.stage}, m.sug.seats?{seats:m.sug.seats}:{}, m.sug.value?{value:m.sug.value}:{}); l.events.push([Date.now(),"Applied Gmail suggestion: "+m.sug.text,"manual"]); box.innerHTML="✓ Applied"; }
+  if(act==="ignore"){ box.innerHTML="Ignored. You can still update this lead manually."; }
+  if(act==="open"){ selId=+box.dataset.lead; $("syncModal").classList.remove("show"); }
+  if(act==="create"){ const x=regexExtract(m.body); const l={id:nextId++,company:x.company||"New company",contact:x.contact||m.from,role:"Head of Learning",source:"Email",interest:x.interest||"Not specified",value:x.value||0,seats:x.seats||0,stage:"New",domain:m.from.split("@")[1],events:[[Date.now(),"Lead created from Gmail: "+m.subj,"in"]]}; leads.push(l); selId=l.id; box.innerHTML=`✓ Created ${esc(l.company)} and scored it`; }
+  renderAll();
+};
+$("syncBtn").onclick = runSync;
+$("syncDone").onclick = ()=>{ $("syncModal").classList.remove("show"); renderAll(); };
+$("syncModal").onclick = e=>{ if(e.target.id==="syncModal") $("syncModal").classList.remove("show"); };
+function setAiState(){ const s=$("aiState"); s.textContent = sample ? "AI: Claude connected" : "AI: template mode"; }
+
+$("list").onclick = e=>{ const b=e.target.closest(".lead"); if(b){ selId=+b.dataset.id; renderList(); renderDetail(); } };
+$("q").addEventListener("input",renderList);
+$("captureBtn").onclick = openModal; $("cancelBtn").onclick = closeModal;
+$("modal").onclick = e=>{ if(e.target.id==="modal") closeModal(); };
+$("sampleEmail").onclick = ()=>{ $("emailIn").value = SAMPLE_EMAIL; };
+$("extractBtn").onclick = extract; $("addBtn").onclick = addLead;
+$("resetBtn").onclick = (e)=>{ e.preventDefault(); filter=""; leads=seed(); gmailQueue=GMAIL_QUEUE(); updateSyncCount(); selId=null; renderAll(); toast("Demo reset"); };
+
+selId = 4; renderAll(); updateSyncCount();
+(async()=>{ try{ sample = window.claude && window.claude.use ? await window.claude.use("sample") : null; }catch(e){ sample=null; } setAiState(); })();
+setTimeout(()=>{ if($("aiState").textContent.includes("checking")) setAiState(); }, 11000);
+</script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Recommender · MVP by Divya Singh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f3f2f0;--paper:#fff;--ink:#121316;--ink2:#3b3d44;--muted:#73767e;--line:#e4e2de;--blue:#2536d4;--soft:#e9ebfb;--green:#127a3c;--greenbg:#dcf5e5;
+    --sans:"Inter Tight",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  button,input,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:var(--paper);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--blue);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:13px}
+  .brand small{display:block;font-weight:500;font-size:12.5px;color:var(--muted);letter-spacing:0}
+  .link{background:none;border:0;color:var(--ink2);text-decoration:underline;text-underline-offset:3px;font-size:14.5px;padding:0}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 24px 60px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+  h1{font-size:clamp(34px,5vw,50px);line-height:1.04;font-weight:800;letter-spacing:-.04em;margin-top:12px}
+  .lead{font-size:19px;color:var(--ink2);margin-top:14px;max-width:600px}
+  .btn{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:14px 26px;font-weight:700;font-size:16.5px}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn:disabled{opacity:.45;cursor:default}
+  .row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:30px}
+  .progress{height:6px;background:#e4e2de;border-radius:6px;overflow:hidden;margin-bottom:30px}
+  .progress i{display:block;height:100%;background:var(--blue);border-radius:6px;transition:width .3s}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+  .opt{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:20px 22px;text-align:left;transition:border-color .15s,transform .15s}
+  .opt:hover{border-color:var(--blue);transform:translateY(-2px)}
+  .opt.sel{border-color:var(--blue);background:#f7f8fe}
+  .opt b{display:block;font-size:18px;letter-spacing:-.01em}
+  .opt span{display:block;color:var(--muted);font-size:14.5px;margin-top:3px}
+  .card{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:30px;margin-top:26px}
+  .card.best{border-color:var(--blue)}
+  .match{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;background:var(--greenbg);color:var(--green);padding:5px 12px;border-radius:999px}
+  .pname{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-top:14px}
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+  .facts div{background:var(--bg);border-radius:10px;padding:10px 12px}
+  .facts span{display:block;font-size:12px;color:var(--muted)}
+  .facts b{font-size:15px}
+  .why{margin-top:22px}
+  .why h4{font-size:14px;font-family:var(--mono);font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .why li{list-style:none;padding:9px 0 9px 30px;position:relative;border-bottom:1px solid var(--line);font-size:16.5px}
+  .why li::before{content:"✓";position:absolute;left:4px;top:9px;color:var(--green);font-weight:800}
+  .more{display:flex;gap:20px;flex-wrap:wrap;margin-top:20px}
+  .alt{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:18px 22px;margin-top:12px}
+  .alt b{font-size:17px}
+  .alt span{display:block;color:var(--muted);font-size:14px}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .slot{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-weight:600}
+  .slot.sel{border-color:var(--blue);background:#f7f8fe;color:var(--blue)}
+  .field{margin-top:16px}
+  .field label{font-size:13.5px;color:var(--muted)}
+  .field input,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:5px;background:var(--paper)}
+  textarea{min-height:120px;resize:vertical}
+  .handoff{background:var(--ink);color:#fff;border-radius:18px;padding:24px;margin-top:22px}
+  .handoff .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#8f9bff}
+  .handoff p{color:#d6d7dc;margin-top:8px;font-size:15.5px}
+  .handoff ul{margin-top:10px;padding-left:18px;color:#d6d7dc;font-size:15px}
+  .answer{background:#f7f8fe;border:1.5px solid var(--soft);border-radius:14px;padding:16px;margin-top:14px;white-space:pre-wrap;font-size:15.5px}
+  .answer .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+  .examples{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .ex{background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:9px 12px;text-align:left;color:var(--ink2);font-size:14px}
+  .ex:hover{border-color:var(--blue);color:var(--blue)}
+  .understood{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+  .understood>span{font-size:13px;color:var(--muted);margin-right:4px}
+  .chip{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px}
+  .chip span{color:var(--muted);font-size:12px;margin-left:2px}
+  .chip:hover{border-color:var(--blue)}
+  .aiwhy{margin-top:16px;font-size:16.5px;color:var(--ink2)}
+  .aiwhy:empty{display:none}
+  .refine{margin-top:18px}
+  .refine label{font-size:14px;color:var(--muted)}
+  .refrow{display:flex;gap:10px;margin-top:6px}
+  .refrow input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:11px 16px;background:var(--paper)}
+  .refrow .btn{padding:10px 20px;font-size:15px}
+  .note{text-align:center;color:var(--muted);font-size:12.5px;padding:0 24px 30px}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .7s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .fade{animation:f .25s ease}
+  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media(max-width:620px){.opts{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}.slots{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo">CR</div><div>Course Recommender<small>Describe your goal, get the right programme</small></div></div>
+  <button class="link" id="restart" style="display:none">Start over</button>
+</header>
+<main class="wrap" id="app"></main>
+<p class="note">MVP prototype by Divya Singh. Sample catalogue of 12 programmes. Matching rules are shown with every result. Understanding what you write, refining and Q&amp;A use Claude when available, otherwise built-in rules. <span id="aiState"></span></p>
+
+<script>
+/* ---------- Catalogue (sample) ---------- */
+const P = [
+  {id:1, kw:/\b(product)/i, name:"Product Management Professional Certificate", goals:["switch","grow"], fn:["tech","product","ops","sales","marketing"], exp:[2,12], hours:6, months:6, fee:2.4, format:"Online, live weekend classes"},
+  {id:2, kw:/\b(ai for business|ai strateg|genai|artificial intelligence)/i, name:"AI for Business Leaders", goals:["lead","grow"], fn:["all"], exp:[8,30], hours:4, months:3, fee:1.8, format:"Online, self-paced with live sessions"},
+  {id:3, kw:/\b(data|analytics|sql|dashboards?)/i, name:"Data Analytics Certificate", goals:["switch","grow"], fn:["tech","finance","ops","marketing"], exp:[0,8], hours:8, months:6, fee:1.6, format:"Online, live and projects"},
+  {id:4, kw:/\b(marketing|brand|growth|digital)/i, name:"Digital Marketing Strategy", goals:["grow","switch"], fn:["marketing","sales"], exp:[2,10], hours:5, months:4, fee:1.2, format:"Online, self-paced"},
+  {id:5, kw:/\b(senior leader|cxo|c-suite|executive)/i, name:"Senior Leadership Programme", goals:["lead"], fn:["all"], exp:[12,35], hours:6, months:9, fee:6.5, format:"Blended, 2 campus visits"},
+  {id:6, kw:/\b(first[- ]time manager|new manager|lead a team|team of)/i, name:"First-time Managers Programme", goals:["lead"], fn:["all"], exp:[3,10], hours:4, months:3, fee:0.9, format:"Online, live cohort"},
+  {id:7, kw:/\b(hr|people analytics|talent)/i, name:"Strategic HR and People Analytics", goals:["grow","lead"], fn:["hr"], exp:[4,15], hours:5, months:5, fee:1.5, format:"Online, live cohort"},
+  {id:8, kw:/\b(finance|p&l|budgeting)/i, name:"Finance for Non-Finance Managers", goals:["grow","lead"], fn:["tech","product","ops","sales","marketing","hr"], exp:[3,15], hours:4, months:2, fee:0.6, format:"Online, self-paced"},
+  {id:9, kw:/\b(startup|own business|venture|founder)/i, name:"Entrepreneurship and Venture Building", goals:["start"], fn:["all"], exp:[3,30], hours:6, months:6, fee:2.2, format:"Online, live with mentors"},
+  {id:10, kw:/\b(supply chain|operations|logistics)/i, name:"Supply Chain and Operations Excellence", goals:["grow","lead"], fn:["ops"], exp:[3,15], hours:5, months:5, fee:1.4, format:"Online, live cohort"},
+  {id:11, kw:/\b(ai engineer|machine learning|ml|llm|deep learning)/i, name:"Full-stack AI Engineering", goals:["switch","grow"], fn:["tech"], exp:[1,10], hours:10, months:8, fee:3.2, format:"Online, live and labs"},
+  {id:12, kw:/\b(sales leader|sales team)/i, name:"Sales Leadership Programme", goals:["lead","grow"], fn:["sales"], exp:[5,15], hours:4, months:4, fee:1.3, format:"Online, live cohort"}
+];
+
+/* ---------- Questions ---------- */
+const Q = [
+  {key:"goal", q:"What do you want this programme to do for you?", opts:[["switch","Switch to a new role","Move into a different function or field"],["grow","Grow in my current role","Get better at what I already do"],["lead","Lead a team","Step up to managing or leading people"],["start","Start a business","Build and launch my own venture"]]},
+  {key:"fn", q:"Which area do you work in today?", opts:[["tech","Technology","Engineering, IT, data"],["product","Product","Product or project roles"],["sales","Sales","Sales and business development"],["marketing","Marketing","Brand, growth, digital"],["finance","Finance","Finance and accounting"],["hr","HR and L&D","People, talent, learning"],["ops","Operations","Ops, supply chain, delivery"]]},
+  {key:"exp", q:"How many years have you been working?", opts:[["2","0 to 3 years",""],["5","3 to 8 years",""],["11","8 to 15 years",""],["18","15+ years",""]]},
+  {key:"hours", q:"How much time can you give each week?", opts:[["4","Up to 4 hours","A light, steady pace"],["6","5 to 7 hours","A few evenings a week"],["10","8+ hours","I can go all in"]]},
+  {key:"budget", q:"What budget are you planning for?", opts:[["1","Under INR 1 lakh",""],["2.5","INR 1 to 2.5 lakh",""],["99","Above INR 2.5 lakh",""],["0","Not sure yet","We will show the best fit"]]}
+];
+const LABEL = {}; Q.forEach(q=>q.opts.forEach(o=>LABEL[q.key+":"+o[0]]=o[1]));
+
+/* ---------- Matching (transparent rules) ---------- */
+function match(a){
+  return P.map(p=>{
+    let sc=0; const why=[], miss=[];
+    if(p.goals.includes(a.goal)){ sc+=40; why.push(`Built for people who want to ${LABEL["goal:"+a.goal].toLowerCase()}`); } else miss.push("Different main goal");
+    if(p.fn.includes("all")||p.fn.includes(a.fn)){ sc+=25; why.push(p.fn.includes("all")?"Open to every function, including yours":`Designed for ${LABEL["fn:"+a.fn]} professionals`); } else miss.push("Not aimed at your function");
+    const e=+a.exp; if(e>=p.exp[0]&&e<=p.exp[1]){ sc+=20; why.push(`Fits your experience (${LABEL["exp:"+a.exp]})`); } else if(e>=p.exp[0]-3&&e<=p.exp[1]+3){ sc+=8; miss.push("Experience is at the edge of the range"); } else miss.push("Experience outside the usual range");
+    if(lastPrompt && p.kw && p.kw.test(lastPrompt)){ sc+=10; why.unshift(`Matches what you said you want: ${(lastPrompt.match(p.kw)||[""])[0].toLowerCase()}`); }
+    if(p.hours<=+a.hours){ sc+=10; why.push(`${p.hours} hours a week fits your time`); } else miss.push(`Needs about ${p.hours} hours a week`);
+    const b=+a.budget; if(b===0||b===99||p.fee<=b){ sc+=5; if(b) why.push("Within your budget"); } else miss.push("Above your budget");
+    const raw=sc; sc=Math.min(sc,100);
+    return {p, sc, raw, why, miss, prim: p.goals[0]===a.goal?1:0};
+  }).sort((x,y)=>y.raw-x.raw||y.prim-x.prim||x.p.fee-y.p.fee);
+}
+
+/* ---------- State + render ---------- */
+const app = document.getElementById("app");
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let editOne = false;
+let A = {}, step = -1, results = null, pick = 0, sample = null;
+const fee = f => `INR ${f.toFixed(1).replace(/\.0$/,"")} lakh`;
+
+function render(view){
+  $("restart").style.display = step>=0 ? "" : "none";
+  app.innerHTML = `<div class="fade">${view}</div>`;
+  window.scrollTo(0,0);
+}
+
+const EXAMPLES = [
+  "I'm a sales manager with 9 years' experience. I want to move into product management, can study a few evenings a week, budget around 2 lakh.",
+  "HR professional, 6 years in. I've just been asked to lead a team of 8 and want to prepare. Weekends only, under 1 lakh.",
+  "Software engineer, 4 years. I want to switch into AI engineering and can put in 10 hours a week."
+];
+let lastPrompt = "", why = "";
+function start(){
+  step=-1; A={}; results=null; pick=0; why=""; lastPrompt="";
+  render(`<div class="kick">Course Recommender</div>
+    <h1>Tell us where you are and where you want to go.</h1>
+    <p class="lead">Write it the way you'd say it to a friend: your role, experience, goal, time and budget. We'll find the programme that fits and explain why.</p>
+    <div class="field"><textarea id="free" placeholder="e.g. I'm a sales manager with 9 years' experience and want to move into product..."></textarea></div>
+    <div class="examples">${EXAMPLES.map((e,i)=>`<button class="ex" data-i="${i}">${esc(e.split(".")[0])}…</button>`).join("")}</div>
+    <div class="row"><button class="btn primary" id="find">Find my programme</button><button class="link" id="useQ">Not sure what to write? Answer 5 quick questions</button></div>`);
+  app.querySelectorAll(".ex").forEach(b=>b.onclick=()=>{ $("free").value=EXAMPLES[+b.dataset.i]; $("free").focus(); });
+  $("useQ").onclick=()=>ask(0);
+  $("find").onclick=()=>fromPrompt($("free").value.trim());
+}
+async function fromPrompt(t){
+  if(!t){ $("free").focus(); return; }
+  lastPrompt=t; const b=$("find"); b.disabled=true; b.innerHTML=`<span class="spin"></span> Understanding your goal`;
+  let x=null;
+  if(sample){ try{ x=await sample.json(`Map this learner's description to exactly one value per field. Return only JSON {"goal":"switch|grow|lead|start","fn":"tech|product|sales|marketing|finance|hr|ops","exp":"2|5|11|18","hours":"4|6|10","budget":"1|2.5|99|0"}. goal = what they want (switch role, grow in current role, lead a team, start a business). fn = the area they work in TODAY, not the one they want. exp: 2 = 0-3 years, 5 = 3-8, 11 = 8-15, 18 = 15+. hours a week: 4 = up to 4 or weekends only, 6 = 5-7 or a few evenings, 10 = 8+. budget in INR lakh: 1 = under 1, 2.5 = 1 to 2.5, 99 = above 2.5, 0 = not mentioned.\n\nDescription: ${t}`,{modelTier:"quick"}); }catch(e){ x=null; } }
+  if(!x||!x.goal) x=parseFree(t);
+  setA(x); pick=0; why=""; result();
+}
+function setA(x){
+  A={goal:String(x.goal),fn:String(x.fn),exp:String(x.exp),hours:String(x.hours),budget:String(x.budget)};
+  Q.forEach(q=>{ if(!q.opts.some(o=>o[0]===A[q.key])) A[q.key]=q.key==="budget"?"0":q.opts[0][0]; });
+}
+function ask(i){
+  step=i; const q=Q[i];
+  render(`<div class="progress"><i style="width:${(i/Q.length)*100}%"></i></div>
+    <div class="qhead"><span class="kick">Question ${i+1} of ${Q.length}</span>${i>0?'<button class="link" id="back">Back</button>':''}</div>
+    <h1 style="font-size:clamp(28px,4vw,40px)">${q.q}</h1>
+    <div class="opts">${q.opts.map(o=>`<button class="opt ${A[q.key]===o[0]?'sel':''}" data-v="${o[0]}"><b>${o[1]}</b>${o[2]?`<span>${o[2]}</span>`:''}</button>`).join("")}</div>`);
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ A[q.key]=b.dataset.v; b.classList.add("sel"); setTimeout(()=> (editOne || i+1>=Q.length) ? (editOne=false, pick=0, why="", result()) : ask(i+1), 160); });
+  if($("back")) $("back").onclick=()=>ask(i-1);
+}
+
+function result(){
+  step=Q.length; results = match(A); const r = results[pick]; const p=r.p;
+  const others = results.filter((_,j)=>j!==pick).slice(0,2);
+  const chips = Q.map((q,i)=>`<button class="chip" data-q="${i}">${esc(chipText(q.key))} <span>✎</span></button>`).join("");
+  render(`<div class="kick">${pick===0?'Your best match':'Another good option'}</div>
+    <div class="understood"><span>What we understood</span>${chips}</div>
+    <div class="card best">
+      <span class="match">● ${r.sc}% match</span>
+      <div class="pname">${esc(p.name)}</div>
+      <div class="facts"><div><span>Duration</span><b>${p.months} months</b></div><div><span>Time</span><b>${p.hours} hrs/week</b></div><div><span>Fee</span><b>${fee(p.fee)}</b></div><div><span>Format</span><b>${esc(p.format.split(",")[0])}</b></div></div>
+      ${pick===0?`<p class="aiwhy" id="aiWhy">${why?esc(why):""}</p>`:""}
+      <div class="why"><h4>Why it fits you</h4><ul>${r.why.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>${r.miss.length?`<p style="color:var(--muted);font-size:14px;margin-top:10px">Worth knowing: ${esc(r.miss.join("; "))}.</p>`:""}</div>
+      <div class="row" style="margin-top:26px"><button class="btn primary" id="book">Book a free 15-min counsellor call</button></div>
+      <div class="more"><button class="link" id="askQ">Ask a question about this programme</button><button class="link" id="seeOthers">See ${others.length} other matches</button></div>
+      <div id="qa"></div>
+    </div>
+    <div class="refine"><label for="ref">Not quite right? Tell us what to change</label>
+      <div class="refrow"><input id="ref" placeholder="e.g. something cheaper · I only have weekends · more about leadership"><button class="btn" id="refGo">Update</button></div></div>
+    <div id="othersBox" style="display:none">${others.map(o=>`<div class="alt"><div><b>${esc(o.p.name)}</b><span>${o.sc}% match · ${o.p.months} months · ${fee(o.p.fee)}</span></div><button class="btn" data-id="${o.p.id}" style="padding:9px 18px;font-size:14.5px">View</button></div>`).join("")}</div>`);
+  $("book").onclick=()=>book(r);
+  $("seeOthers").onclick=()=>{ const b=$("othersBox"); b.style.display=b.style.display==="none"?"block":"none"; };
+  app.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{ pick=results.findIndex(x=>x.p.id===+b.dataset.id); result(); });
+  $("askQ").onclick=()=>askQuestion(p);
+  app.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ editOne=true; ask(+c.dataset.q); });
+  $("refGo").onclick=()=>refine($("ref").value.trim());
+  $("ref").addEventListener("keydown",e=>{ if(e.key==="Enter") refine($("ref").value.trim()); });
+  if(pick===0 && !why && sample && lastPrompt) personalWhy(r);
+}
+function chipText(k){
+  const v=LABEL[k+":"+A[k]]||"";
+  return {goal:v, fn:"Works in "+v, exp:v.replace(" years"," yrs")+" experience", hours:v+" a week", budget: A.budget==="0"?"Budget open":v}[k];
+}
+async function personalWhy(r){
+  try{ const res=await sample(`In 2 sentences, speaking to the learner as "you", explain why this programme fits what they wrote. Be specific to their words. No em dashes, no hype.\n\nWhat they wrote: ${lastPrompt}\nProgramme: ${r.p.name}, ${r.p.months} months, ${r.p.hours} hours a week, ${fee(r.p.fee)}, ${r.p.format}.`,{modelTier:"quick",onText:({text})=>{ const el=$("aiWhy"); if(el) el.textContent=text; }}); why=res.text; }catch(e){}
+}
+async function refine(t){
+  if(!t) return; const b=$("refGo"); b.disabled=true; b.innerHTML='<span class="spin"></span>';
+  let x=null;
+  if(sample){ try{ x=await sample.json(`A learner's current profile is ${JSON.stringify(A)} (goal: switch|grow|lead|start; fn: tech|product|sales|marketing|finance|hr|ops; exp: 2|5|11|18 years band; hours: 4|6|10 a week; budget: 1|2.5|99|0 INR lakh, 0 = open). They now say: "${t}". Return only the full updated JSON with the same keys and allowed values, changing only what their words imply.`,{modelTier:"quick"}); }catch(e){ x=null; } }
+  if(!x||!x.goal) x=refineRules(t);
+  lastPrompt = lastPrompt ? lastPrompt+" "+t : t;
+  setA(x); pick=0; why=""; result();
+}
+function refineRules(t){
+  t=t.toLowerCase(); const x={...A};
+  const B=["1","2.5","99"], H=["4","6","10"];
+  if(/cheap|lower (?:fee|cost|price)|less expensive|afford|budget/.test(t)){ const i=B.indexOf(x.budget); x.budget = i<0 ? "2.5" : B[Math.max(0,i-1)]; }
+  if(/weekend|less time|busy|fewer hours|shorter|lighter/.test(t)) x.hours="4";
+  if(/more time|full[- ]?time|all in|intensive/.test(t)) x.hours="10";
+  if(/lead|manag(?:e|ing) (?:a )?team|leadership/.test(t)) x.goal="lead";
+  if(/switch|move into|change (?:my )?career|transition/.test(t)) x.goal="switch";
+  if(/start(?:up)?|own business|venture/.test(t)) x.goal="start";
+  return x;
+}
+
+function askQuestion(p){
+  $("qa").innerHTML = `<div class="field"><textarea id="qTxt" style="min-height:70px" placeholder="e.g. Is there an EMI option? Will I get a certificate?"></textarea></div><div class="row" style="margin-top:10px"><button class="btn primary" id="qGo" style="padding:10px 20px;font-size:15px">Ask</button></div><div id="qOut"></div>`;
+  $("qTxt").focus();
+  $("qGo").onclick = async ()=>{
+    const q=$("qTxt").value.trim(); if(!q) return;
+    const out=$("qOut"); out.innerHTML=`<div class="answer"><span class="spin"></span></div>`;
+    let t=null;
+    if(sample){ try{ const r=await sample(`You answer questions from prospective learners about one programme. Use only these facts; if the answer is not in them, say a counsellor will confirm on the call. 2 to 3 sentences, friendly, no em dashes.\n\nProgramme: ${p.name}\nDuration: ${p.months} months\nTime: ${p.hours} hours a week\nFee: ${fee(p.fee)}, EMI available from about INR ${Math.round(p.fee*100000/12/100)*100} a month over 12 months\nFormat: ${p.format}\nCertificate: yes, on completion\nCareer support: resume review and two mock interviews\n\nQuestion: ${q}`,{modelTier:"quick",onText:({text})=>{out.innerHTML=`<div class="answer"><div class="k">Answer · Claude</div>${esc(text)}</div>`;}}); t=r.text; }catch(e){ t=null; } }
+    if(!t) t=faq(p,q);
+    out.innerHTML=`<div class="answer"><div class="k">Answer${sample?' · Claude':''}</div>${esc(t)}</div>`;
+  };
+}
+function faq(p,q){
+  q=q.toLowerCase();
+  if(/emi|instal|pay|fee|cost|price/.test(q)) return `The fee is ${fee(p.fee)}. You can pay in EMIs from about INR ${Math.round(p.fee*100000/12/100)*100} a month over 12 months. Your counsellor can share the exact plans.`;
+  if(/time|hour|week|schedule|weekend/.test(q)) return `Plan for about ${p.hours} hours a week over ${p.months} months. Format: ${p.format}.`;
+  if(/certif/.test(q)) return `Yes, you get a certificate on completion.`;
+  if(/job|placement|career|interview/.test(q)) return `Career support includes a resume review and two mock interviews. Your counsellor can walk you through outcomes for past learners.`;
+  return `Good question. Your counsellor will confirm this on the call, along with anything else you want to check.`;
+}
+
+function book(r){
+  const slots=["Tomorrow, 11:00 am","Tomorrow, 4:30 pm","Day after, 10:00 am"]; let s=null;
+  render(`<div class="kick">Book a call · ${esc(r.p.name)}</div>
+    <h1 style="font-size:clamp(28px,4vw,40px)">Pick a time. A counsellor will call you.</h1>
+    <div class="slots">${slots.map((x,i)=>`<button class="slot" data-i="${i}">${x}</button>`).join("")}</div>
+    <div class="field"><label>Your name</label><input id="nm" placeholder="e.g. Aditi Sharma"></div>
+    <div class="field"><label>Phone</label><input id="ph" placeholder="+91" inputmode="tel"></div>
+    <div class="row"><button class="btn primary" id="confirm" disabled>Confirm call</button><button class="link" id="backRes">Back to my match</button></div>`);
+  const check=()=>{ $("confirm").disabled = !(s!==null && $("nm").value.trim() && $("ph").value.trim().length>=6); };
+  app.querySelectorAll(".slot").forEach(b=>b.onclick=()=>{ app.querySelectorAll(".slot").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); s=+b.dataset.i; check(); });
+  ["nm","ph"].forEach(id=>$(id).addEventListener("input",check));
+  $("backRes").onclick=result;
+  $("confirm").onclick=()=>done(r, slots[s], $("nm").value.trim());
+}
+
+function done(r, slot, name){
+  const first=name.split(" ")[0];
+  render(`<div class="kick" style="color:var(--green)">Booked</div>
+    <h1 style="font-size:clamp(28px,4vw,40px)">You're all set, ${esc(first)}. We'll call you ${esc(slot.toLowerCase())}.</h1>
+    <p class="lead">No need to repeat yourself on the call. Your counsellor already has this:</p>
+    <div class="handoff"><div class="k">What your counsellor sees</div>
+      <p><b style="color:#fff">${esc(name)}</b> wants to ${esc(LABEL["goal:"+A.goal].toLowerCase())}. Works in ${esc(LABEL["fn:"+A.fn])}, ${esc(LABEL["exp:"+A.exp])} of experience. Can give ${esc(LABEL["hours:"+A.hours].toLowerCase())} a week; budget: ${esc(LABEL["budget:"+A.budget].replace("Not sure yet","not decided yet"))}.</p>
+      <p>Matched to <b style="color:#fff">${esc(r.p.name)}</b> (${r.sc}% match) because:</p>
+      <ul>${r.why.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>
+      ${r.miss.length?`<p>To discuss: ${esc(r.miss.join("; "))}.</p>`:""}
+    </div>
+    <div class="row"><button class="btn" id="again">Explore another goal</button></div>`);
+  $("again").onclick=start;
+}
+
+/* ---------- Describe in your own words ---------- */
+function describe(){
+  step=0;
+  render(`<div class="kick">In your own words</div>
+    <h1 style="font-size:clamp(28px,4vw,40px)">Tell us where you are and where you want to go.</h1>
+    <div class="field"><textarea id="free" placeholder="e.g. I'm a sales manager with 9 years' experience. I want to move into product management, can study a few evenings a week, and have about 2 lakh to spend."></textarea></div>
+    <div class="row"><button class="btn primary" id="find">Find my match</button><button class="link" id="useQ">Answer 5 questions instead</button></div>`);
+  $("useQ").onclick=()=>ask(0);
+  $("find").onclick=async ()=>{
+    const t=$("free").value.trim(); if(!t) return;
+    const b=$("find"); b.disabled=true; b.innerHTML=`<span class="spin"></span> Reading`;
+    let x=null;
+    if(sample){ try{ x=await sample.json(`Map this learner's description to exactly one value per field. Return only JSON {"goal":"switch|grow|lead|start","fn":"tech|product|sales|marketing|finance|hr|ops","exp":"2|5|11|18","hours":"4|6|10","budget":"1|2.5|99|0"}. exp: 2 = 0-3 years, 5 = 3-8, 11 = 8-15, 18 = 15+. hours: 4 = up to 4/week, 6 = 5-7, 10 = 8+. budget in INR lakh: 1 = under 1, 2.5 = 1 to 2.5, 99 = above 2.5, 0 = unknown.\n\nDescription: ${t}`,{modelTier:"quick"}); }catch(e){ x=null; } }
+    if(!x||!x.goal) x=parseFree(t);
+    A={goal:String(x.goal),fn:String(x.fn),exp:String(x.exp),hours:String(x.hours),budget:String(x.budget)};
+    Q.forEach(q=>{ if(!q.opts.some(o=>o[0]===A[q.key])) A[q.key]=q.opts[0][0]; });
+    pick=0; result();
+  };
+}
+function parseFree(t){
+  t=t.toLowerCase(); const n=+(t.match(/(\d+)\s*\+?\s*(?:years|yrs)/)||[])[1]||5;
+  const goal=/start|own business|founder|venture/.test(t)?"start":/move into|switch|transition|change (?:my )?career/.test(t)?"switch":/lead|manager of|manage a team|leadership/.test(t)?"lead":"grow";
+  const fn=/sales|business development/.test(t)?"sales":/market/.test(t)?"marketing":/financ|account/.test(t)?"finance":/hr\b|human|talent|l&d|learning/.test(t)?"hr":/product/.test(t)&&!/into product/.test(t)?"product":/engineer|developer|software|it\b|data/.test(t)?"tech":/operation|supply|logistic/.test(t)?"ops":"ops";
+  const exp=n<3?"2":n<8?"5":n<15?"11":"18";
+  const hn=+(t.match(/(\d+)\s*(?:hours|hrs)/)||[])[1]||0;
+  const hours=/full[- ]?time|all in/.test(t)||hn>=8?"10":/light|busy/.test(t)||(hn&&hn<=4)?"4":/weekend|few evenings|evenings/.test(t)||hn?"6":"4";
+  const l=+(t.match(/([\d.]+)\s*(?:lakh|l\b)/)||[])[1]||0;
+  const under=/under|below|less than|within/.test(t);
+  const budget=!l?"0":(l<1||(under&&l<=1))?"1":(l<=2.5||(under&&l<=3))?"2.5":"99";
+  return {goal,fn,exp,hours,budget};
+}
+
+$("restart").onclick=start;
+start();
+(async()=>{ try{ sample = window.claude && window.claude.use ? await window.claude.use("sample") : null; }catch(e){ sample=null; } $("aiState").textContent = sample ? "AI: Claude connected." : ""; })();
+</script>
+</body>
+</html>

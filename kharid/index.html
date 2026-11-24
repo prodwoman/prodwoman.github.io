@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kharid · AI procure-to-pay · MVP by Divya Singh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f6f5f1;--paper:#fff;--ink:#14171a;--ink2:#41474d;--muted:#7a8087;--line:#e6e3dc;--teal:#0f766e;--teal2:#0b5d57;--tealbg:#e6f4f2;
+    --amber:#a15c07;--amberbg:#fff3dc;--red:#b42318;--redbg:#fdecea;--green:#14804a;--greenbg:#e4f5ea;--sans:"Inter Tight",Inter,system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  .num,td.n,.money{font-variant-numeric:tabular-nums}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  a{color:var(--teal)}
+  .top{display:flex;align-items:center;gap:18px;padding:12px 24px;background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap;position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+  .logo{width:32px;height:32px;border-radius:9px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:800}
+  .brand small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:0}
+  .roles{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:999px;margin-left:auto;flex-wrap:wrap}
+  .roles button{border:0;background:none;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+  .roles button.on{background:var(--paper);color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .nav{display:flex;gap:16px;padding:9px 24px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+  .nav a{color:var(--ink2);text-decoration:none;font-weight:600}
+  .nav a.on{color:var(--teal)}
+  .nav .sp{margin-left:auto;color:var(--muted);font-weight:500}
+  main{max-width:1180px;margin:0 auto;padding:22px 24px 60px}
+  .btn{border:1.5px solid var(--ink);background:var(--paper);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:var(--ink)}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--teal2)}
+  .btn.ghost{border-color:var(--line)}
+  .btn.danger{border-color:#f1c4bf;color:var(--red)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .link{background:none;border:0;color:var(--ink2);text-decoration:underline;text-underline-offset:3px;font-size:14px;padding:0}
+  .today{background:var(--ink);color:#fff;border-radius:18px;padding:22px 26px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .today .tx{flex:1;min-width:260px}
+  .today .k{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7fd6cc}
+  .today .h{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:4px;line-height:1.2}
+  .today .s{color:#c9ced3;margin-top:4px}
+  .today .btn.primary{background:#14b8a6;border-color:#14b8a6;color:#062b27;padding:13px 22px;font-size:15.5px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:18px}
+  .card h2{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .card h3{font-size:15px;font-weight:800}
+  .sub{color:var(--muted);font-size:13.5px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .kpi b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi span{color:var(--muted);font-size:12.5px}
+  .q{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:0}
+  .q .t{font-weight:700}
+  .q .d{color:var(--muted);font-size:13px}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--bg);color:var(--ink2);white-space:nowrap}
+  .pill.ok{background:var(--greenbg);color:var(--green)}
+  .pill.warn{background:var(--amberbg);color:var(--amber)}
+  .pill.bad{background:var(--redbg);color:var(--red)}
+  .pill.teal{background:var(--tealbg);color:var(--teal)}
+  .ai{display:inline-block;font-size:10.5px;font-weight:800;color:#7c3aed;background:#f1ebff;border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  td.n,th.n{text-align:right}
+  tr.best td{background:#f2faf8}
+  .prog{display:flex;gap:0;margin:14px 0 4px;flex-wrap:wrap}
+  .prog div{flex:1;min-width:90px;text-align:center;font-size:12px;font-weight:700;color:var(--muted);position:relative;padding-top:18px}
+  .prog div::before{content:"";position:absolute;top:5px;left:0;right:0;height:3px;background:var(--line)}
+  .prog div::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;background:var(--paper);border:3px solid var(--line)}
+  .prog div.done{color:var(--ink2)}
+  .prog div.done::before,.prog div.cur::before{background:var(--teal)}
+  .prog div.done::after{background:var(--teal);border-color:var(--teal)}
+  .prog div.cur{color:var(--teal)}
+  .prog div.cur::after{border-color:var(--teal);background:#fff;box-shadow:0 0 0 4px var(--tealbg)}
+  .prog.rej div.cur{color:var(--red)} .prog.rej div.cur::after{border-color:var(--red)}
+  .bar{height:10px;background:var(--bg);border-radius:999px;overflow:hidden;position:relative}
+  .bar i{display:block;height:100%;border-radius:999px;background:var(--teal)}
+  .bar i.c{background:#5eead4}
+  .bar i.over{background:var(--red)}
+  .bars{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--bg)}
+  .field{margin-top:12px}
+  .field label{font-size:12.5px;color:var(--muted);font-weight:600;display:block}
+  .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:4px;background:#fff}
+  .field.aif input,.field.aif select,.field.aif textarea{border-color:#d9c9ff;background:#fbf9ff}
+  textarea.big{width:100%;min-height:96px;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-size:16px;resize:vertical;background:#fff}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{border:1px dashed var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ink2)}
+  .chip:hover{border-color:var(--teal);color:var(--teal)}
+  .note{background:var(--tealbg);border-radius:12px;padding:12px 14px;font-size:14px;color:#0b4b46;margin-top:12px}
+  .warnbox{background:var(--amberbg);border-radius:12px;padding:12px 14px;font-size:14px;color:#6b3d05;margin-top:12px}
+  .badbox{background:var(--redbg);border-radius:12px;padding:12px 14px;font-size:14px;color:#7a1a12;margin-top:12px}
+  .okbox{background:var(--greenbg);border-radius:12px;padding:12px 14px;font-size:14px;color:#0e5a34;margin-top:12px}
+  .doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;font-size:13.5px}
+  .doc h1{font-size:22px;letter-spacing:-.02em}
+  .muted{color:var(--muted)}
+  .right{text-align:right}
+  .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+  .audit li{list-style:none;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .audit li span{color:var(--muted);font-size:12.5px;margin-right:8px}
+  .modal{position:fixed;inset:0;background:rgba(20,23,26,.45);display:none;place-items:center;padding:20px;z-index:50}
+  .modal.show{display:grid}
+  .dialog{background:#fff;border-radius:18px;max-width:620px;width:100%;padding:24px;max-height:90vh;overflow:auto}
+  .dialog h3{font-size:19px;font-weight:800}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+  .toast.show{opacity:1}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .7s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .empty{padding:30px;text-align:center;color:var(--muted)}
+  footer{max-width:1180px;margin:0 auto;padding:0 24px 30px;color:var(--muted);font-size:12.5px}
+  .back{color:var(--ink2);text-decoration:none;font-weight:600;font-size:14px}
+  .h1{font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-top:8px}
+  .split{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:start}
+  @media(max-width:900px){.grid2,.grid3,.split{grid-template-columns:1fr}.grid5{grid-template-columns:1fr 1fr}.roles{margin-left:0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#home"><div class="logo">K</div><div>Kharid<small>AI procure-to-pay · Brightpath Learning</small></div></a>
+  <div class="roles" id="roles"></div>
+</header>
+<nav class="nav" id="nav"></nav>
+<main id="app"></main>
+<footer>MVP prototype by Divya Singh. Brightpath Learning and every supplier here are fictional. Plain-language intake, summaries, drafts and invoice reading use Claude when available, otherwise built-in rules. <a href="#home" id="resetLink">Reset demo</a></footer>
+<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= helpers ================= */
+const DAY = 864e5, NOW = Date.now();
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+const lakh = n => n >= 100000 ? "₹" + (n/100000).toFixed(n % 100000 === 0 ? 0 : 2).replace(/\.?0+$/,"") + " lakh" : inr(n);
+const d = t => new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+const iso = t => new Date(t).toISOString().slice(0,10);
+const ago = n => NOW - n*DAY, ahead = n => NOW + n*DAY;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
+function modal(html){ $("dialog").innerHTML = html; $("modal").classList.add("show"); }
+function closeModal(){ $("modal").classList.remove("show"); }
+$("modal").onclick = e => { if(e.target.id==="modal") closeModal(); };
+let sample = null;
+
+/* ================= company, people, rules ================= */
+const CO = {name:"Brightpath Learning Pvt Ltd", sites:{Gurugram:{state:"HR", gstin:"06AAKCB4821K1Z2", addr:"Tower B, Cyber Park, Sector 39, Gurugram, Haryana 122002"}, Bengaluru:{state:"KA", gstin:"29AAKCB4821K1Z8", addr:"4th Floor, 100 Feet Road, Indiranagar, Bengaluru, Karnataka 560038"}}};
+const STATE = {HR:"Haryana", KA:"Karnataka", DL:"Delhi", MH:"Maharashtra"};
+const ROLES = {
+  requester:{label:"Requester", name:"Aman", title:"Sales Manager", dept:"Sales"},
+  approver:{label:"Approver", name:"Neha", title:"Head of Sales", step:"Department head"},
+  procurement:{label:"Procurement", name:"Ritu", title:"Procurement Lead"},
+  finance:{label:"Finance", name:"Karan", title:"Accounts Manager", step:"Finance"},
+  cfo:{label:"CFO", name:"Meera", title:"CFO", step:"CFO"}
+};
+const GL = {Sales:"6100 · Sales expenses", Marketing:"6200 · Marketing & events", Academics:"6300 · Content & academics", Technology:"6400 · IT & software", Operations:"6500 · Office & admin", HR:"6600 · People & hiring"};
+const CATS = ["IT hardware","Software","Cloud","Events & print","Office supplies","Services & content"];
+const GSTIN_RE = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+let S; // the whole demo state
+function seed(){
+  const st = {role:"requester", seq:{R:1034, PO:15, INV:9}, audit:[],
+    settings:{deptLimit:50000, financeLimit:500000},
+    depts:{Sales:1200000, Marketing:1800000, Academics:800000, Technology:2500000, Operations:1000000, HR:500000},
+    suppliers:[
+      {id:"S1", name:"Arcadia Tech Distributors", cat:"IT hardware", state:"HR", gstin:"06AABCA1234B1Z5", pan:"AABCA1234B", msme:true, bank:true, onTime:96, accuracy:98, status:"Approved"},
+      {id:"S2", name:"Nimbus Systems", cat:"IT hardware", state:"KA", gstin:"29AACCN5678D1Z3", pan:"AACCN5678D", msme:false, bank:true, onTime:91, accuracy:95, status:"Approved"},
+      {id:"S3", name:"Vertex Computers", cat:"IT hardware", state:"DL", gstin:"07AAFCV9012E1Z1", pan:"AAFCV9012E", msme:true, bank:true, onTime:78, accuracy:90, status:"Approved", late:3},
+      {id:"S4", name:"Licensia Software", cat:"Software", state:"MH", gstin:"27AAGCL3456F1Z9", pan:"AAGCL3456F", msme:false, bank:true, onTime:99, accuracy:99, status:"Approved"},
+      {id:"S5", name:"CloudKraft", cat:"Cloud", state:"KA", gstin:"29AAHCC7890G1Z7", pan:"AAHCC7890G", msme:false, bank:true, onTime:100, accuracy:97, status:"Approved"},
+      {id:"S6", name:"Printwala Studio", cat:"Events & print", state:"HR", gstin:"06AAJFP2345H1Z4", pan:"AAJFP2345H", msme:true, bank:true, onTime:88, accuracy:84, status:"Approved"},
+      {id:"S7", name:"StageCraft Events", cat:"Events & print", state:"KA", gstin:"29AAKFS6789J1Z2", pan:"AAKFS6789J", msme:true, bank:true, onTime:93, accuracy:92, status:"Approved"},
+      {id:"S8", name:"OfficeNest Supplies", cat:"Office supplies", state:"HR", gstin:"06AALCO1122K1Z6", pan:"AALCO1122K", msme:true, bank:true, onTime:95, accuracy:96, status:"Approved"},
+      {id:"S9", name:"PaperTrail Stationers", cat:"Office supplies", state:"DL", gstin:"07AAMFP33Z4", pan:"AAMFP3344L", msme:true, bank:false, onTime:85, accuracy:88, status:"Pending documents"},
+      {id:"S10", name:"Wordsmith Collective", cat:"Services & content", state:"MH", gstin:"27AANFW5566M1Z8", pan:"AANFW5566M", msme:true, bank:true, onTime:90, accuracy:94, status:"Approved"},
+      {id:"S11", name:"Frameline Studios", cat:"Services & content", state:"KA", gstin:"29AAPFF7788N1Z0", pan:"AAPFF7788N", msme:true, bank:true, onTime:87, accuracy:91, status:"Approved"},
+      {id:"S12", name:"Brightline Talent Hub", cat:"Services & content", state:"HR", gstin:"06AAQFB9900P1Z3", pan:"AAQFB9900P", msme:false, bank:true, onTime:92, accuracy:93, status:"Approved"}
+    ],
+    catalog:[
+      {id:"C1", name:"Laptop, 14 inch, i5, 16 GB, 512 GB SSD", sup:"S1", price:64500, gst:18, cat:"IT hardware"},
+      {id:"C2", name:"Monitor, 24 inch FHD", sup:"S1", price:11800, gst:18, cat:"IT hardware"},
+      {id:"C3", name:"Wireless keyboard and mouse set", sup:"S8", price:2150, gst:18, cat:"IT hardware"},
+      {id:"C4", name:"Headset with mic", sup:"S8", price:2900, gst:18, cat:"IT hardware"},
+      {id:"C5", name:"Docking station, USB-C", sup:"S2", price:9800, gst:18, cat:"IT hardware"},
+      {id:"C6", name:"Video conferencing licence (annual)", sup:"S4", price:15900, gst:18, cat:"Software"},
+      {id:"C7", name:"Design suite licence (annual)", sup:"S4", price:24600, gst:18, cat:"Software"},
+      {id:"C8", name:"Project tool seat (annual)", sup:"S4", price:8400, gst:18, cat:"Software"},
+      {id:"C9", name:"Cloud credits pack (₹1 lakh)", sup:"S5", price:100000, gst:18, cat:"Cloud"},
+      {id:"C10", name:"A4 paper ream, 75 gsm", sup:"S8", price:290, gst:12, cat:"Office supplies"},
+      {id:"C11", name:"Stationery kit (new joiner)", sup:"S8", price:650, gst:18, cat:"Office supplies"},
+      {id:"C12", name:"Whiteboard markers, box of 10", sup:"S8", price:340, gst:18, cat:"Office supplies"},
+      {id:"C13", name:"Ergonomic office chair", sup:"S8", price:13900, gst:18, cat:"Office supplies"},
+      {id:"C14", name:"Printed brochure, A4 tri-fold", sup:"S6", price:42, gst:18, cat:"Events & print"},
+      {id:"C15", name:"Standee, 6x3 ft", sup:"S6", price:1850, gst:18, cat:"Events & print"},
+      {id:"C16", name:"Sales training workbook", sup:"S6", price:1800, gst:18, cat:"Events & print"},
+      {id:"C17", name:"Branded T-shirt", sup:"S6", price:420, gst:5, cat:"Events & print"},
+      {id:"C18", name:"Course script, per module", sup:"S10", price:18000, gst:18, cat:"Services & content"},
+      {id:"C19", name:"Explainer video, 90 seconds", sup:"S11", price:45000, gst:18, cat:"Services & content"},
+      {id:"C20", name:"Webcam, full HD", sup:"S2", price:4200, gst:18, cat:"IT hardware"}
+    ],
+    requests:[], rfqs:[], pos:[], receipts:[], invoices:[], payments:[],
+    contracts:[
+      {id:"K1", name:"Video conferencing (annual)", sup:"S4", value:477000, start:ago(325), end:ahead(40), owner:"Technology"},
+      {id:"K2", name:"Cloud hosting commitment", sup:"S5", value:3600000, start:ago(200), end:ahead(165), owner:"Technology"},
+      {id:"K3", name:"Office supplies rate contract", sup:"S8", value:600000, start:ago(90), end:ahead(275), owner:"Operations"},
+      {id:"K4", name:"Events retainer", sup:"S7", value:1200000, start:ago(310), end:ahead(55), owner:"Marketing"},
+      {id:"K5", name:"Content writing framework", sup:"S10", value:900000, start:ago(150), end:ahead(215), owner:"Academics"}
+    ]
+  };
+  S = st;
+  // helpers to build seeded history
+  const mk = (o) => { const r = {aiFields:[], approvals:[], createdAt:ago(o.days||5), city:"Gurugram", source:"catalog", ...o}; r.total = r.items.reduce((a,x)=>a+x.qty*x.unitPrice,0); r.glCode = GL[r.dept]; st.requests.push(r); return r; };
+  const ap = (r, steps, upto) => { r.approvals = steps.map((s,i)=>({step:s, who:whoFor(s, r.dept), status: i<upto ? "approved" : i===upto ? "pending" : "waiting", at: i<upto ? r.createdAt + (i+1)*0.4*DAY : null})); };
+  const po = (r, sup, status, daysAgo, extra={}) => { const p = {id:"PO-" + String(st.seq.PO++).padStart(4,"0"), reqId:r.id, sup, lines:r.items.map(x=>({name:x.name, qty:x.qty, unitPrice:x.unitPrice, gst:x.gst||18})), city:r.city, terms:"Net 30", createdAt:ago(daysAgo), sentAt:ago(daysAgo), status, ...extra}; st.pos.push(p); r.poId = p.id; return p; };
+  const rc = (p, qtys, daysAgo) => { st.receipts.push({poId:p.id, lines:p.lines.map((l,i)=>({name:l.name, qty:qtys[i]})), at:ago(daysAgo), by:"Office team", condition:"Good"}); };
+  const inv = (p, o) => { const i = {id:"INV-" + String(st.seq.INV++).padStart(4,"0"), poId:p.id, sup:p.sup, number:o.number, date:ago(o.days), lines:o.lines || p.lines.map(l=>({...l})), status:o.status||"to_match", source:"email", due:ahead(o.due ?? 20)}; st.invoices.push(i); return i; };
+  const pay = (i, daysAgo) => { i.status = "paid"; st.payments.push({invId:i.id, utr:"UTR" + (4823000000 + Math.floor(Math.random()*900000)), at:ago(daysAgo), amount:invTotal(i)}); };
+
+  // ---- paid history (this month) ----
+  const hist = [
+    ["R1011","Marketing","Event standees for campus fair",[["Standee, 6x3 ft",20,1850,"C15"]],"S6",22],
+    ["R1012","Technology","Annual design suite licences",[["Design suite licence (annual)",12,24600,"C7"]],"S4",21],
+    ["R1013","Operations","Ergonomic chairs for Gurugram floor 2",[["Ergonomic office chair",18,13900,"C13"]],"S8",19],
+    ["R1014","Academics","Course scripts for Data Analytics programme",[["Course script, per module",14,18000,"C18"]],"S10",18],
+    ["R1015","HR","New joiner stationery kits",[["Stationery kit (new joiner)",60,650,"C11"]],"S8",17],
+    ["R1016","Technology","Cloud credits for LMS migration",[["Cloud credits pack (₹1 lakh)",5,100000,"C9"]],"S5",16],
+    ["R1017","Marketing","Explainer videos for 3 programmes",[["Explainer video, 90 seconds",3,45000,"C19"]],"S11",14],
+    ["R1018","Sales","Headsets for inside sales team",[["Headset with mic",24,2900,"C4"]],"S8",13],
+    ["R1019","Technology","Docking stations for engineering",[["Docking station, USB-C",15,9800,"C5"]],"S2",12]
+  ];
+  hist.forEach(([id,dept,title,items,sup,days]) => {
+    const r = mk({id, dept, title, requester:people(dept), items:items.map(([n,q,p,c])=>({name:n,qty:q,unitPrice:p,catalogId:c,gst:catGst(c)})), days, status:"paid", neededBy:ago(days-6)});
+    ap(r, chainFor(r), 99); const p = po(r, sup, "closed", days-2); rc(p, p.lines.map(l=>l.qty), days-5);
+    const i = inv(p, {number:"BP/"+(2600+days), days:days-6}); pay(i, days-9);
+  });
+  // savings history: R1019 was sourced via quotes
+  st.requests.find(r=>r.id==="R1019").source = "quotes";
+  st.rfqs.push({id:"RFQ-0003", reqId:"R1019", suppliers:["S1","S2","S3"], sentAt:ago(14), quotes:[{sup:"S1",unitPrice:10400,delivery:ago(8),warranty:1,terms:"Net 30"},{sup:"S2",unitPrice:9800,delivery:ago(9),warranty:1,terms:"Net 30"},{sup:"S3",unitPrice:10150,delivery:ago(6),warranty:1,terms:"Net 15"}], awarded:"S2"});
+
+  // ---- invoices to match ----
+  const r20 = mk({id:"R1020", dept:"Technology", title:"Video conferencing licences for new hires", requester:people("Technology"), items:[{name:"Video conferencing licence (annual)", qty:30, unitPrice:15900, catalogId:"C6", gst:18}], days:11, status:"invoiced", neededBy:ago(3)});
+  ap(r20, chainFor(r20), 99); const p20 = po(r20, "S4", "received", 9); rc(p20,[30],6); inv(p20,{number:"LS/INV/8841", days:2});
+  const r21 = mk({id:"R1021", dept:"Marketing", title:"Brochures for admissions roadshow", requester:people("Marketing"), items:[{name:"Printed brochure, A4 tri-fold", qty:5000, unitPrice:42, catalogId:"C14", gst:18}], days:10, status:"invoiced", neededBy:ago(2)});
+  ap(r21, chainFor(r21), 99); const p21 = po(r21, "S6", "received", 8); rc(p21,[5000],4); inv(p21,{number:"PW-2611-077", days:1, lines:[{name:"Printed brochure, A4 tri-fold", qty:5000, unitPrice:46, gst:18}]});
+  const r22 = mk({id:"R1022", dept:"Academics", title:"Laptops for video editing team", requester:people("Academics"), items:[{name:"Laptop, 14 inch, i5, 16 GB, 512 GB SSD", qty:10, unitPrice:64500, catalogId:"C1", gst:18}], days:12, status:"invoiced", neededBy:ago(1)});
+  ap(r22, chainFor(r22), 99); const p22 = po(r22, "S1", "partially received", 10); rc(p22,[8],3); inv(p22,{number:"ATD/26/1193", days:1});
+  // duplicate of a paid invoice (R1016 cloud credits)
+  const p16 = st.pos.find(p=>p.reqId==="R1016"); inv(p16,{number:"BP/2616", days:0, status:"to_match"});
+
+  // ---- ordered, awaiting receipt ----
+  const r23 = mk({id:"R1023", dept:"Sales", title:"Laptops for Gurugram sales team", requester:{name:"Aman", dept:"Sales"}, items:[{name:"Laptop, 14 inch, i5, 16 GB, 512 GB SSD", qty:12, unitPrice:64500, catalogId:"C1", gst:18}], days:9, status:"ordered", neededBy:ahead(2)});
+  ap(r23, chainFor(r23), 99); const p23 = po(r23, "S1", "partially received", 6); rc(p23,[8],1);
+  const r24 = mk({id:"R1024", dept:"Operations", title:"Keyboard and mouse sets for Bengaluru office", requester:people("Operations"), items:[{name:"Wireless keyboard and mouse set", qty:40, unitPrice:2150, catalogId:"C3", gst:18}], days:7, status:"ordered", city:"Bengaluru", neededBy:ahead(1)});
+  ap(r24, chainFor(r24), 99); po(r24, "S8", "sent", 4);
+
+  // ---- rejected ----
+  const r25 = mk({id:"R1025", dept:"Marketing", title:"Branded T-shirts for all staff", requester:people("Marketing"), items:[{name:"Branded T-shirt", qty:400, unitPrice:420, catalogId:"C17", gst:5}], days:8, status:"rejected", neededBy:ahead(10)});
+  ap(r25, chainFor(r25), 1); r25.approvals[1].status = "rejected"; r25.approvals[1].at = ago(6); r25.approvals[1].note = "Not in this quarter's plan. Revisit in January.";
+
+  // ---- procurement queue ----
+  const r26 = mk({id:"R1026", dept:"Operations", title:"Monitors for Bengaluru hot desks", requester:people("Operations"), items:[{name:"Monitor, 24 inch FHD", qty:25, unitPrice:11800, catalogId:"C2", gst:18}], days:3, status:"approved", city:"Bengaluru", neededBy:ahead(9)});
+  ap(r26, chainFor(r26), 99);
+  const r27 = mk({id:"R1027", dept:"Academics", title:"Laptops for new content team", requester:people("Academics"), items:[{name:"Laptop, 14 inch, i7, 16 GB, 1 TB SSD", qty:15, unitPrice:78000, gst:18}], days:6, status:"rfq", source:"quotes", neededBy:ahead(12)});
+  ap(r27, chainFor(r27), 99);
+  st.rfqs.push({id:"RFQ-0004", reqId:"R1027", suppliers:["S1","S2","S3"], sentAt:ago(3), quotes:[
+    {sup:"S1", unitPrice:76900, delivery:ahead(6), warranty:1, terms:"Net 30"},
+    {sup:"S2", unitPrice:79400, delivery:ahead(8), warranty:3, terms:"Net 45"},
+    {sup:"S3", unitPrice:74200, delivery:ahead(15), warranty:1, terms:"Advance 50%"}]});
+  r27.rfqId = "RFQ-0004";
+  const r28 = mk({id:"R1028", dept:"Marketing", title:"Freelance video editors for admissions campaign", requester:people("Marketing"), items:[{name:"Video editing, per finished minute", qty:60, unitPrice:3500, gst:18}], days:2, status:"approved", source:"quotes", neededBy:ahead(20)});
+  ap(r28, chainFor(r28), 99);
+
+  // ---- approvals pending ----
+  const r29 = mk({id:"R1029", dept:"Marketing", title:"Campaign creatives for January intake", requester:people("Marketing"), items:[{name:"Explainer video, 90 seconds", qty:4, unitPrice:45000, catalogId:"C19", gst:18},{name:"Standee, 6x3 ft", qty:30, unitPrice:1850, catalogId:"C15", gst:18}], days:2, status:"pending", neededBy:ahead(18)});
+  ap(r29, chainFor(r29), 1);
+  const r30 = mk({id:"R1030", dept:"Technology", title:"Cloud credits for exam season traffic", requester:people("Technology"), items:[{name:"Cloud credits pack (₹1 lakh)", qty:6, unitPrice:100000, catalogId:"C9", gst:18}], days:3, status:"pending", city:"Bengaluru", neededBy:ahead(10)});
+  ap(r30, chainFor(r30), 2);
+  const r31 = mk({id:"R1031", dept:"Sales", title:"Laptops for new Bengaluru sales hires", requester:{name:"Aman", dept:"Sales"}, items:[{name:"Laptop, 14 inch, i5, 16 GB, 512 GB SSD", qty:15, unitPrice:64500, catalogId:"C1", gst:18}], days:1, status:"pending", city:"Bengaluru", neededBy:ahead(21), justification:"Six new hires join on 1 Dec and nine more in January."});
+  ap(r31, chainFor(r31), 0);
+  const r32 = mk({id:"R1032", dept:"Sales", title:"Venue for quarterly sales kickoff", requester:people("Sales"), items:[{name:"Conference hall with AV, 1 day", qty:1, unitPrice:180000, gst:18}], days:1, status:"pending", source:"quotes", neededBy:ahead(25)});
+  ap(r32, chainFor(r32), 0);
+  const r33 = mk({id:"R1033", dept:"Sales", title:"Sales training workbooks", requester:people("Sales"), items:[{name:"Sales training workbook", qty:20, unitPrice:1800, catalogId:"C16", gst:18}], days:0.5, status:"pending", neededBy:ahead(14)});
+  ap(r33, chainFor(r33), 0);
+
+  st.requests.sort((a,b)=>b.createdAt-a.createdAt);
+  st.audit = [];
+  st.requests.forEach(r => { log(r.requester.name, `Raised ${r.id}: ${r.title}`, r.id, r.createdAt); r.approvals.filter(a=>a.status==="approved").forEach(a=>log(a.who, `Approved ${r.id} (${a.step})`, r.id, a.at)); });
+  st.pos.forEach(p => log("Ritu", `Sent ${p.id} to ${sup(p.sup).name}`, p.reqId, p.sentAt));
+  st.receipts.forEach(x => { const p = poById(x.poId); log("Office team", `Recorded receipt on ${p.id}`, p.reqId, x.at); });
+  st.payments.forEach(x => { const i = invById(x.invId); log("Karan", `Paid ${i.number} (${x.utr})`, poById(i.poId).reqId, x.at); });
+  st.audit.sort((a,b)=>b.at-a.at);
+}
+function people(dept){ return {name:{Sales:"Rohit",Marketing:"Ishita",Academics:"Dev",Technology:"Sanjay",Operations:"Pooja",HR:"Farah"}[dept], dept}; }
+function whoFor(step, dept){ return step==="Department head" ? ({Sales:"Neha",Marketing:"Kabir",Academics:"Anita",Technology:"Vikram",Operations:"Suresh",HR:"Lata"}[dept]) : step==="Finance" ? "Karan" : "Meera"; }
+function catGst(cid){ const c = S.catalog.find(x=>x.id===cid); return c ? c.gst : 18; }
+
+/* ================= derived data ================= */
+const sup = id => S.suppliers.find(s=>s.id===id) || {name:"Unknown supplier", state:"HR"};
+const reqById = id => S.requests.find(r=>r.id===id);
+const poById = id => S.pos.find(p=>p.id===id);
+const invById = id => S.invoices.find(i=>i.id===id);
+const rfqFor = r => S.rfqs.find(x=>x.reqId===r.id);
+function log(who, what, ref, at){ S.audit.unshift({at: at || Date.now(), who, what, ref}); }
+function gstSplit(lines, city, supId){
+  const base = lines.reduce((a,l)=>a+l.qty*l.unitPrice,0);
+  const tax = lines.reduce((a,l)=>a+l.qty*l.unitPrice*(l.gst||18)/100,0);
+  const intra = CO.sites[city||"Gurugram"].state === sup(supId).state;
+  return {base, tax, intra, cgst: intra ? tax/2 : 0, sgst: intra ? tax/2 : 0, igst: intra ? 0 : tax, total: base + tax};
+}
+const poTotal = p => gstSplit(p.lines, p.city, p.sup).total;
+const invTotal = i => { const p = poById(i.poId); return gstSplit(i.lines, p ? p.city : "Gurugram", i.sup).total; };
+function receivedQty(p){ return p.lines.map((l,idx)=>S.receipts.filter(r=>r.poId===p.id).reduce((a,r)=>a+(r.lines[idx]?.qty||0),0)); }
+function budget(dept){
+  const total = S.depts[dept];
+  let committed = 0, paid = 0;
+  S.pos.filter(p=>reqById(p.reqId)?.dept===dept).forEach(p => {
+    const invs = S.invoices.filter(i=>i.poId===p.id && i.status==="paid");
+    const pd = invs.reduce((a,i)=>a+gstSplit(i.lines,p.city,p.sup).base,0);
+    paid += pd; committed += Math.max(0, gstSplit(p.lines,p.city,p.sup).base - pd);
+  });
+  return {total, committed, paid, used: committed+paid, left: total - committed - paid};
+}
+function chainFor(r){
+  const b = budget(r.dept);
+  const over = r.total > b.left;
+  if(r.total <= S.settings.deptLimit && !over) return ["Department head"];
+  if(r.total <= S.settings.financeLimit && !over) return ["Department head","Finance"];
+  return ["Department head","Finance","CFO"];
+}
+const curApproval = r => r.approvals.find(a=>a.status==="pending");
+const STEPS = ["Requested","Approved","Sourced","Ordered","Received","Invoiced","Paid"];
+function stageIdx(r){
+  if(r.status==="pending" || r.status==="rejected") return 0;
+  if(r.status==="approved") return 1;
+  if(r.status==="rfq") return 2;
+  if(r.status==="ordered"){ const p = poById(r.poId); return p && receivedQty(p).some(q=>q>0) ? 4 : 3; }
+  if(r.status==="received") return 4;
+  if(r.status==="invoiced") return 5;
+  return 6;
+}
+function progress(r){
+  const k = stageIdx(r), done = r.status==="paid";
+  return `<div class="prog ${r.status==="rejected"?"rej":""}">${STEPS.map((s,i)=>`<div class="${i<k||done?"done":i===k?"cur":""}">${r.status==="rejected"&&i===0?"Rejected":s}</div>`).join("")}</div>`;
+}
+function statusPill(r){
+  const m = {pending:["Awaiting approval","warn"], approved:["Approved","teal"], rfq:["Quotes in progress","teal"], ordered:["Ordered","teal"], received:["Received","teal"], invoiced:["Invoiced","teal"], paid:["Paid","ok"], rejected:["Rejected","bad"]}[r.status] || [r.status,""];
+  return `<span class="pill ${m[1]}">${m[0]}</span>`;
+}
+
+/* ================= invoice matching ================= */
+function matchInvoice(i){
+  const p = poById(i.poId);
+  if(!p) return {state:"nopo", lines:[], msg:"No purchase order found for this invoice."};
+  const dup = S.invoices.find(x => x.id !== i.id && x.sup === i.sup && x.number.trim().toLowerCase() === i.number.trim().toLowerCase());
+  const s = sup(i.sup);
+  const rec = receivedQty(p);
+  const issues = [];
+  const lines = p.lines.map((l,idx) => {
+    const il = i.lines[idx] || {qty:0, unitPrice:0, gst:l.gst};
+    const qOk = il.qty <= rec[idx] && il.qty <= l.qty;
+    const pOk = Math.abs(il.unitPrice - l.unitPrice) < 0.5;
+    const tOk = (il.gst||18) === (l.gst||18);
+    if(!qOk) issues.push(`Invoice bills ${il.qty.toLocaleString("en-IN")} × ${l.name}, but only ${rec[idx].toLocaleString("en-IN")} ${rec[idx]===1?"was":"were"} received (PO: ${l.qty.toLocaleString("en-IN")}).`);
+    if(!pOk) issues.push(`Price per unit is ${inr(il.unitPrice)} on the invoice vs ${inr(l.unitPrice)} on the PO (${il.unitPrice>l.unitPrice?"+":"-"}${inr(Math.abs(il.unitPrice-l.unitPrice))} each, ${inr(Math.abs(il.unitPrice-l.unitPrice)*il.qty)} in total).`);
+    if(!tOk) issues.push(`GST rate ${il.gst}% on the invoice vs ${l.gst}% on the PO.`);
+    return {name:l.name, poQty:l.qty, rec:rec[idx], invQty:il.qty, poPrice:l.unitPrice, invPrice:il.unitPrice, qOk, pOk, tOk};
+  });
+  if(i.gstin && i.gstin !== s.gstin) issues.push(`Supplier GSTIN on the invoice (${i.gstin}) does not match the supplier record (${s.gstin}).`);
+  if(dup) return {state:"duplicate", lines, dup, msg:`This looks like a duplicate of invoice ${dup.number} (${dup.status==="paid"?"already paid":"already received"} on ${d(dup.date)}, ${inr(invTotal(dup))}).`};
+  const over = invTotal(i) - gstSplit(lines.map((l,idx)=>({qty:Math.min(l.invQty,l.rec), unitPrice:l.poPrice, gst:p.lines[idx].gst})), p.city, p.sup).total;
+  return issues.length ? {state:"mismatch", lines, issues, over} : {state:"matched", lines};
+}
+
+/* ================= AI (with fallbacks) ================= */
+function parseIntake(t){
+  const s = t.toLowerCase().replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty)\b/g, w => ({one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twelve:12,fifteen:15,twenty:20})[w]);
+  let qty = +((s.match(/(\d+)\s*(?:x\s*)?(?:nos?\.?|units?|pcs|pieces|sets?|seats?|licences?|licenses?)?\s+[a-z]/) || [])[1] || 1);
+  const words = s.replace(/[^a-z0-9 ]/g," ");
+  let item = null;
+  const keys = [["laptop","C1"],["monitor","C2"],["keyboard","C3"],["mouse","C3"],["headset","C4"],["dock","C5"],["video conf","C6"],["zoom","C6"],["design","C7"],["project tool","C8"],["cloud","C9"],["paper","C10"],["stationery","C11"],["marker","C12"],["chair","C13"],["brochure","C14"],["standee","C15"],["workbook","C16"],["t-shirt","C17"],["tshirt","C17"],["script","C18"],["explainer","C19"],["webcam","C20"]];
+  for(const [k,c] of keys){ if(s.includes(k)){ item = S.catalog.find(x=>x.id===c); break; } }
+  let price = 0; const m = s.match(/(?:under|below|upto|up to|max|within|around|about|@|at)\s*(?:rs\.?|₹|inr)?\s*([\d.,]+)\s*(k|lakh|l\b)?/);
+  if(m){ price = parseFloat(m[1].replace(/,/g,"")) * (m[2]==="k"?1000:(m[2]&&m[2].startsWith("l"))?100000:1); }
+  const deptK = Object.keys(S.depts).find(k => new RegExp("\\b" + k.toLowerCase() + "\\b").test(s));
+  const city = /bengaluru|bangalore|blr/.test(s) ? "Bengaluru" : "Gurugram";
+  let needed = ahead(14);
+  const dm = t.match(/(?:by|before|on)\s+(\d{1,2})\s*(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/i);
+  if(dm){ const mo = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(dm[2].toLowerCase()); const dt = new Date(); dt.setMonth(mo, +dm[1]); dt.setHours(12); if(dt.getTime() < NOW - DAY) dt.setFullYear(dt.getFullYear()+1); needed = dt.getTime(); }
+  const perUnit = /\beach\b|\bper\b|\/unit|a piece/.test(s);
+  if(!item && !perUnit) qty = 1;
+  const name = item ? item.name : (t.split(/,| for | by | under | around | about /i)[0].replace(/^\s*\d+\s*/,"").trim() || "Item");
+  const unit = item ? (price && price < item.price ? price : item.price) : (price || 10000);
+  return {category: item ? item.cat : "Services & content", items:[{name: item ? item.name : name.charAt(0).toUpperCase() + name.slice(1), qty, unitPrice: unit, catalogId: item && (!price || price >= item.price) ? item.id : null, gst: item ? item.gst : 18}],
+    dept: deptK || "Sales", city, neededBy: needed, justification: t, source: item && (!price || price >= item.price) ? "catalog" : "quotes", title: (item ? item.name.split(",")[0] : name) + (qty>1 ? ` × ${qty}` : "")};
+}
+async function aiIntake(t){
+  let out = parseIntake(t), used = false;
+  if(sample){
+    try{
+      const cat = S.catalog.map(c=>({id:c.id, name:c.name, price:c.price, gst:c.gst, category:c.cat}));
+      const r = await sample.json(`You are the intake assistant for a procurement tool at an Indian EdTech company. Turn the employee's request into JSON with exactly these keys: {"title": short title, "dept": one of ${JSON.stringify(Object.keys(S.depts))} (guess from context, default "Sales"), "category": one of ${JSON.stringify(CATS)}, "items": [{"name": string, "qty": number, "unitPrice": number in INR (use the catalog price if a catalog item fits, otherwise a realistic estimate within any limit they gave), "catalogId": catalog id or null, "gst": GST % number}], "city": "Gurugram" or "Bengaluru", "neededBy": "YYYY-MM-DD" (today is ${iso(NOW)}), "justification": one sentence, "source": "catalog" if every item is a catalog item at or under their price limit, else "quotes"}.\n\nCatalog: ${JSON.stringify(cat)}\n\nRequest: ${t}`, {modelTier:"quick"});
+      if(r && Array.isArray(r.items) && r.items.length){
+        out = {...out, ...r, items: r.items.map(x=>({name:String(x.name), qty:+x.qty||1, unitPrice:+x.unitPrice||0, catalogId:x.catalogId||null, gst:+x.gst||18})), neededBy: Date.parse(r.neededBy) || out.neededBy, dept: S.depts[r.dept] ? r.dept : out.dept, city: CO.sites[r.city] ? r.city : out.city};
+        used = true;
+      }
+    }catch(e){}
+  }
+  return {...out, used};
+}
+async function aiText(prompt, fallback){
+  if(sample){ try{ const r = await sample(prompt, {modelTier:"quick"}); if(r && r.text) return {text:r.text, ai:true}; }catch(e){} }
+  return {text:fallback, ai:false};
+}
+
+/* ================= quotes ================= */
+function analyseQuotes(r, rfq){
+  const hw = /laptop|monitor|desktop|computer|printer|hardware/i.test(r.items[0].name) || r.category==="IT hardware";
+  const qty = r.items[0].qty;
+  const rows = rfq.quotes.map(q => {
+    const s = sup(q.sup);
+    const g = gstSplit([{qty, unitPrice:q.unitPrice, gst:r.items[0].gst||18}], r.city, q.sup);
+    const repair = hw ? Math.max(0, 3 - q.warranty) * 0.05 * q.unitPrice * qty : 0;
+    const late = q.delivery > r.neededBy;
+    return {...q, s, base:g.base, tax:g.tax, total:g.total, tco: g.total + repair, repair, late, rating: Math.round((s.onTime + s.accuracy)/2)};
+  });
+  const eligible = rows.filter(x=>!x.late);
+  const pool = eligible.length ? eligible : rows;
+  const best = pool.reduce((a,b)=> b.tco < a.tco ? b : a);
+  const cheapest = rows.reduce((a,b)=> b.total < a.total ? b : a);
+  const reasons = [];
+  const cheapOk = eligible.length ? eligible.reduce((a,b)=> b.total < a.total ? b : a) : cheapest;
+  if(best === cheapest) reasons.push(`lowest price at ${inr(best.total)} including GST`);
+  else if(best === cheapOk || best.tco >= cheapOk.tco) reasons.push(`lowest price at ${inr(best.total)} including GST among suppliers that can deliver on time`);
+  else reasons.push(`${inr(cheapOk.tco - best.tco)} cheaper than ${cheapOk.s.name} over 3 years once repairs outside warranty are counted, even though its upfront price is ${inr(best.total - cheapOk.total)} higher`);
+  if(hw) reasons.push(`${best.warranty}-year warranty`);
+  reasons.push(`delivers ${d(best.delivery)}, ${Math.round((r.neededBy - best.delivery)/DAY)} days before it's needed`);
+  reasons.push(`supplier score ${best.rating}/100 on delivery and invoice accuracy`);
+  rows.filter(x=>x.late).forEach(x => reasons.push(`${x.s.name} was ruled out: delivery on ${d(x.delivery)} misses the ${d(r.neededBy)} deadline`));
+  const savings = Math.max(...rows.map(x=>x.total)) - best.total;
+  return {rows, best, reasons, savings, hw};
+}
+
+/* ================= routing ================= */
+function go(h){ if(location.hash === "#" + h) render(); else location.hash = h; }
+function setRole(role){ S.role = role; go(role); }
+const routes = [];
+const route = (re, fn) => routes.push([re, fn]);
+function render(){
+  const h = location.hash.slice(1) || S.role;
+  if(ROLES[h]) S.role = h;
+  $("roles").innerHTML = Object.entries(ROLES).map(([k,v])=>`<button class="${k===S.role?"on":""}" data-role="${k}">${v.label} · ${v.name}</button>`).join("");
+  $("roles").querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>setRole(b.dataset.role));
+  const navs = [["home","Home"],["requests","All requests"],["suppliers","Suppliers"],["budgets","Budgets"],["contracts","Contracts"],["catalog","Catalog"],["spend","Spend"],["settings","Settings"]];
+  $("nav").innerHTML = navs.map(([k,v])=>`<a href="#${k==="home"?S.role:k}" class="${(h===k||(k==="home"&&ROLES[h]))?"on":""}">${v}</a>`).join("") + `<span class="sp">Viewing as ${esc(ROLES[S.role].name)}, ${esc(ROLES[S.role].title)}</span>`;
+  for(const [re, fn] of routes){ const m = h.match(re); if(m){ $("app").innerHTML = fn(...m.slice(1)) || ""; wire(h); window.scrollTo(0,0); return; } }
+  go(S.role);
+}
+window.addEventListener("hashchange", () => { closeModal(); render(); });
+let wirers = [];
+const after = fn => wirers.push(fn);
+function wire(){ const w = wirers; wirers = []; w.forEach(fn=>fn()); document.querySelectorAll("[data-go]").forEach(b=>b.onclick=e=>{ e.preventDefault(); go(b.dataset.go); }); }
+
+/* ================= role homes ================= */
+function todayBar(k, h, s, btnLabel, target){
+  return `<section class="today"><div class="tx"><div class="k">${esc(k)}</div><div class="h">${esc(h)}</div>${s?`<div class="s">${esc(s)}</div>`:""}</div>${btnLabel?`<button class="btn primary" data-go="${esc(target)}">${esc(btnLabel)}</button>`:""}</section>`;
+}
+const qrow = (t, dsc, right, btn, target) => `<div class="q"><div><div class="t">${t}</div><div class="d">${dsc}</div></div><div>${right||""}</div><div>${btn?`<button class="btn ghost" data-go="${esc(target)}">${esc(btn)}</button>`:""}</div></div>`;
+function pendingFor(role){ const step = ROLES[role].step; return S.requests.filter(r=>r.status==="pending" && curApproval(r)?.step===step && (role!=="approver" || r.dept==="Sales")); }
+
+route(/^requester$/, () => {
+  const mine = S.requests.filter(r=>r.requester.name==="Aman");
+  const deliveries = mine.filter(r=>r.status==="ordered");
+  const b = budget("Sales");
+  return todayBar("Good morning, Aman", "Need something for your team?", `Sales has ${lakh(b.left)} left this month.`, "Request something", "new") +
+  `<div class="card"><h2>Your requests</h2><div class="sub">Track where each one is. Confirm deliveries when they arrive.</div>
+    ${mine.map(r=>{ const p = poById(r.poId); const rec = p ? receivedQty(p) : []; const part = p && rec.some((q,i)=>q<p.lines[i].qty) && rec.some(q=>q>0);
+      return qrow(`${esc(r.title)} <span class="muted">· ${r.id}</span>`, `${lakh(r.total)} · ${part?`${rec[0]} of ${p.lines[0].qty} delivered`:esc(nextFor(r))}`, statusPill(r), r.status==="ordered" ? "Confirm delivery" : "Track", r.status==="ordered" ? "receive-" + r.poId : "request-" + r.id); }).join("") || `<div class="empty">No requests yet.</div>`}</div>`;
+});
+function nextFor(r){
+  if(r.status==="pending"){ const a = curApproval(r); return `Waiting for ${a.who} (${a.step})`; }
+  if(r.status==="approved") return r.source==="catalog" ? "Procurement is raising the PO" : "Procurement is getting quotes";
+  if(r.status==="rfq") return "Quotes are being compared";
+  if(r.status==="ordered") return `Ordered from ${sup(poById(r.poId)?.sup).name}`;
+  if(r.status==="invoiced") return "Invoice with finance";
+  if(r.status==="paid") return "Done";
+  if(r.status==="rejected") return "Rejected";
+  return "";
+}
+route(/^approver$/, () => {
+  const p = pendingFor("approver");
+  return (p.length ? todayBar("Approvals", `${p.length} request${p.length>1?"s":""} need${p.length>1?"":"s"} your approval`, `Oldest first. ${p.filter(r=>r.total>budget(r.dept).left).length ? "One is over budget." : ""}`, `Review ${p.length} request${p.length>1?"s":""}`, "approve-" + p[p.length-1].id) : todayBar("Approvals", "You're all caught up.", "New requests from your team will appear here.", "", "")) +
+  `<div class="card"><h2>Waiting for you</h2>${p.slice().reverse().map(r=>qrow(`${esc(r.title)} <span class="muted">· ${r.id}</span>`, `${esc(r.requester.name)} · ${lakh(r.total)} · needed by ${d(r.neededBy)}`, r.total>budget(r.dept).left?`<span class="pill bad">Over budget</span>`:"", "Review", "approve-"+r.id)).join("") || `<div class="empty">Nothing waiting.</div>`}</div>`;
+});
+route(/^procurement$/, () => {
+  const rfqReady = S.requests.filter(r=>r.status==="rfq" && rfqFor(r)?.quotes?.length && !rfqFor(r).awarded);
+  const toSource = S.requests.filter(r=>r.status==="approved" && r.source==="quotes");
+  const toPO = S.requests.filter(r=>r.status==="approved" && r.source==="catalog");
+  const toSend = S.pos.filter(p=>p.status==="draft");
+  const deliveries = S.pos.filter(p=>["sent","partially received"].includes(p.status) && reqById(p.reqId)?.requester.name!=="Aman");
+  let bar;
+  if(rfqReady.length){ const r = rfqReady[0]; bar = todayBar("Next up", `Compare quotes for ${r.items[0].qty} ${shortName(r)}`, `${rfqFor(r).quotes.length} quotes are in for ${r.id}.`, "Compare quotes", "rfq-"+r.id); }
+  else if(toSend.length){ const p = toSend[0]; bar = todayBar("Next up", `Send ${p.id} to ${sup(p.sup).name}`, "", "Review and send PO", "po-"+p.id); }
+  else if(toSource.length){ const r = toSource[0]; bar = todayBar("Next up", `Get quotes: ${r.title}`, `Approved ${d(r.approvals.at(-1).at)}. Not in the catalog.`, "Send RFQ", "rfq-"+r.id); }
+  else if(toPO.length){ const r = toPO[0]; bar = todayBar("Next up", `Raise the PO: ${r.title}`, "Catalog item at a fixed price, no quotes needed.", "Create PO", "createpo-"+r.id); }
+  else bar = todayBar("Next up", "Nothing waiting on procurement.", "", "", "");
+  return bar + `<div class="card"><h2>Your queue</h2>
+    ${rfqReady.map(r=>qrow(`Compare quotes · ${esc(r.title)}`, `${r.id} · ${rfqFor(r).quotes.length} quotes`, `<span class="pill teal">Quotes in</span>`, "Compare", "rfq-"+r.id)).join("")}
+    ${toSend.map(p=>qrow(`Send PO · ${esc(reqById(p.reqId).title)}`, `${p.id} · ${esc(sup(p.sup).name)} · ${inr(poTotal(p))}`, `<span class="pill warn">Draft</span>`, "Review", "po-"+p.id)).join("")}
+    ${toSource.map(r=>qrow(`Get quotes · ${esc(r.title)}`, `${r.id} · est. ${lakh(r.total)}`, `<span class="pill">Approved</span>`, "Send RFQ", "rfq-"+r.id)).join("")}
+    ${toPO.map(r=>qrow(`Create PO · ${esc(r.title)}`, `${r.id} · catalog · ${lakh(r.total)}`, `<span class="pill">Approved</span>`, "Create PO", "createpo-"+r.id)).join("")}
+    ${deliveries.map(p=>qrow(`Awaiting delivery · ${esc(reqById(p.reqId).title)}`, `${p.id} · ${esc(sup(p.sup).name)} · ${receivedQty(p)[0]} of ${p.lines[0].qty} received`, `<span class="pill">${esc(p.status)}</span>`, "Record receipt", "receive-"+p.id)).join("")}
+  </div>`;
+});
+const shortName = r => r.items[0].name.split(",")[0].toLowerCase() + (r.items[0].qty>1 && !/s$/.test(r.items[0].name.split(",")[0]) ? "s" : "");
+route(/^finance$/, () => {
+  const invs = S.invoices.filter(i=>["to_match","hold"].includes(i.status));
+  const withRes = invs.map(i=>({i, m:matchInvoice(i)}));
+  const problems = withRes.filter(x=>x.m.state!=="matched");
+  const clean = withRes.filter(x=>x.m.state==="matched");
+  const appr = pendingFor("finance");
+  const toPay = S.invoices.filter(i=>i.status==="approved").sort((a,b)=>a.due-b.due);
+  let bar;
+  if(problems.length) bar = todayBar("Next up", `Resolve ${problems.length} invoice ${problems.length>1?"problems":"problem"}`, (()=>{ const mm = problems.filter(x=>x.m.state!=="duplicate").length, dp = problems.length - mm; return [mm?`${mm} mismatch${mm>1?"es":""}`:"", dp?`${dp} possible duplicate${dp>1?"s":""}`:""].filter(Boolean).join(" and "); })() + " found by the 3-way match. Nothing gets paid until they're cleared.", "Start with the first", "invoice-"+problems[0].i.id);
+  else if(appr.length) bar = todayBar("Next up", `Approve ${appr.length} request${appr.length>1?"s":""}`, "Finance step in the approval chain.", "Review", "approve-"+appr[0].id);
+  else if(clean.length) bar = todayBar("Next up", `${clean.length} invoice${clean.length>1?"s":""} matched and ready to approve`, "", "Review", "invoice-"+clean[0].i.id);
+  else if(toPay.length) bar = todayBar("Next up", `Pay ${toPay.length} approved invoice${toPay.length>1?"s":""}`, `Next due ${d(toPay[0].due)}.`, "Record payment", "pay-"+toPay[0].id);
+  else bar = todayBar("Next up", "All invoices are matched and paid.", "", "", "");
+  const label = x => x.m.state==="matched" ? `<span class="pill ok">Matched</span>` : x.m.state==="duplicate" ? `<span class="pill bad">Duplicate?</span>` : `<span class="pill bad">Mismatch</span>`;
+  return bar + `<div class="split"><div>
+    <div class="card"><h2>Invoices</h2><div class="sub">Every invoice is checked against its PO and what was received.</div>
+      ${withRes.map(x=>qrow(`${esc(sup(x.i.sup).name)} · ${esc(x.i.number)}`, `${x.i.poId} · ${inr(invTotal(x.i))} · due ${d(x.i.due)}${x.i.status==="hold"?" · on hold":""}`, label(x), "Open", "invoice-"+x.i.id)).join("") || `<div class="empty">No invoices waiting.</div>`}
+      <div class="actions"><button class="link" data-go="upload">Add an invoice</button></div></div>
+    <div class="card"><h2>Ready to pay</h2>${toPay.map(i=>qrow(`${esc(sup(i.sup).name)} · ${esc(i.number)}`, `${inr(invTotal(i))} · due ${d(i.due)}`, "", "Record payment", "pay-"+i.id)).join("") || `<div class="empty">Nothing approved for payment yet.</div>`}
+      <div class="actions"><button class="link" id="exportBtn">Export paid and approved invoices for Tally / Zoho Books</button></div></div>
+  </div><div>
+    <div class="card"><h2>Approvals</h2>${appr.map(r=>qrow(esc(r.title), `${r.id} · ${lakh(r.total)} · ${esc(r.dept)}`, "", "Review", "approve-"+r.id)).join("") || `<div class="empty">None waiting.</div>`}</div>
+  </div></div>`;
+});
+route(/^cfo$/, () => {
+  const appr = pendingFor("cfo");
+  const bar = appr.length ? todayBar("Next up", `Approve ${lakh(appr[0].total)}: ${appr[0].title}`, `Above ₹5 lakh, so it needs you. Dept head and finance have approved.`, "Review", "approve-"+appr[0].id)
+    : todayBar("This month", `${lakh(Object.keys(S.depts).reduce((a,k)=>a+budget(k).used,0))} committed or spent so far`, insight(), "See this month's spend", "spend");
+  return bar + spendBody(true);
+});
+
+/* ================= new request ================= */
+let draft = null;
+const EX = ["15 laptops for the new Bengaluru sales hires, under 70k each, needed by 15 Dec","Venue and AV for a 1-day product launch in Gurugram for 120 people, around 2.5 lakh","60 new joiner stationery kits for HR by next Friday"];
+route(/^new$/, () => {
+  after(() => {
+    $("exs").querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ $("ask").value = EX[+b.dataset.ex]; $("ask").focus(); });
+    $("fill").onclick = async () => {
+      const t = $("ask").value.trim(); if(!t){ $("ask").focus(); return; }
+      $("fill").disabled = true; $("fill").innerHTML = `<span class="spin"></span> Filling the form`;
+      const out = await aiIntake(t);
+      draft = {...out, raw:t};
+      renderDraft();
+    };
+  });
+  return `<a class="back" href="#requester">← Back</a><div class="h1">What do you need?</div><div class="sub" style="margin-top:4px">Write it the way you'd say it to a colleague: what, how many, budget, where and by when.</div>
+    <div class="card"><textarea class="big" id="ask" placeholder="e.g. 15 laptops for the new Bengaluru sales hires, under 70k each, needed by 15 Dec"></textarea>
+      <div class="chips" id="exs">${EX.map((e,i)=>`<button class="chip" data-ex="${i}">${esc(e)}</button>`).join("")}</div>
+      <div class="actions"><button class="btn primary" id="fill">Fill the form for me</button></div></div>
+    <div id="draft"></div>`;
+});
+function renderDraft(){
+  const r = draft, it = r.items[0];
+  const total = r.items.reduce((a,x)=>a+x.qty*x.unitPrice,0);
+  const b = budget(r.dept);
+  const chain = chainFor({...r, total});
+  const pct = Math.min(100, (b.used/b.total)*100), npct = Math.min(100-pct, (total/b.total)*100);
+  const over = total > b.left;
+  const cat = !it.catalogId ? S.catalog.find(c => c.cat===r.category && c.name.split(",")[0].toLowerCase().split(" ").some(w=>w.length>3 && it.name.toLowerCase().includes(w))) : null;
+  const AI = r.used ? `<span class="ai">✦ AI</span>` : `<span class="ai" style="background:#eef0f3;color:#6b7280">auto</span>`;
+  $("draft").innerHTML = `<div class="card"><div class="row"><h2 style="margin-right:auto">Check your request</h2><span class="sub">Fields marked ${AI} were filled from what you wrote. Change anything that's off.</span></div>
+    <div class="grid2">
+      <div class="field aif"><label>Item ${AI}</label><input id="fName" value="${esc(it.name)}"></div>
+      <div class="grid2"><div class="field aif"><label>Quantity ${AI}</label><input id="fQty" type="number" min="1" value="${it.qty}"></div><div class="field aif"><label>Unit price, INR ${AI}</label><input id="fPrice" type="number" min="0" value="${it.unitPrice}"></div></div>
+      <div class="field aif"><label>Department ${AI}</label><select id="fDept">${Object.keys(S.depts).map(k=>`<option ${k===r.dept?"selected":""}>${k}</option>`).join("")}</select></div>
+      <div class="grid2"><div class="field aif"><label>Deliver to ${AI}</label><select id="fCity">${Object.keys(CO.sites).map(k=>`<option ${k===r.city?"selected":""}>${k}</option>`).join("")}</select></div><div class="field aif"><label>Needed by ${AI}</label><input id="fDate" type="date" value="${iso(r.neededBy)}"></div></div>
+      <div class="field aif"><label>Category ${AI}</label><select id="fCat">${CATS.map(k=>`<option ${k===r.category?"selected":""}>${k}</option>`).join("")}</select></div>
+      <div class="field"><label>GL code</label><input value="${esc(GL[r.dept])}" disabled></div>
+      <div class="field aif" style="grid-column:1/-1"><label>Why it's needed ${AI}</label><input id="fWhy" value="${esc(r.justification)}"></div>
+    </div>
+    ${it.catalogId ? `<div class="note">✓ Catalog item from <b>${esc(sup(S.catalog.find(c=>c.id===it.catalogId).sup).name)}</b> at a fixed ${inr(it.unitPrice)}. No quotes needed: procurement raises the PO straight after approval.</div>` : cat ? `<div class="note">There's a catalog item close to this: <b>${esc(cat.name)}</b> at ${inr(cat.price)}. <button class="link" id="useCat">Use the catalog item</button> to skip quotes and get it faster.</div>` : `<div class="note">Not in the catalog, so procurement will get 3 quotes after approval.</div>`}
+    <div style="margin-top:16px"><div class="row" style="justify-content:space-between"><b>Budget check · ${esc(r.dept)}</b><span class="sub">${lakh(b.left)} left of ${lakh(b.total)} this month</span></div>
+      <div class="bars" style="margin-top:8px"><i style="width:${pct}%;background:#94a3b8"></i><i style="width:${over?100-pct:npct}%;background:${over?"var(--red)":"var(--teal)"}"></i></div>
+      <div class="${over?"badbox":"okbox"}">${over ? `This request is ${inr(total)} (before GST) and ${r.dept} has ${inr(b.left)} left, so it's <b>over budget</b>. It will go to ${chain.join(", then ")}.` : `This request is ${inr(total)} before GST and fits the budget. It will go to ${chain.join(", then ")}.`}</div></div>
+    <div class="actions"><button class="btn primary" id="submitReq">Submit request</button><button class="link" id="startOver">Start over</button></div></div>`;
+  const read = () => { draft.items[0] = {...draft.items[0], name:$("fName").value, qty:+$("fQty").value||1, unitPrice:+$("fPrice").value||0}; draft.dept = $("fDept").value; draft.city = $("fCity").value; draft.neededBy = Date.parse($("fDate").value)||draft.neededBy; draft.category = $("fCat").value; draft.justification = $("fWhy").value; };
+  ["fQty","fPrice","fDept","fCity","fCat"].forEach(id=>$(id).onchange=()=>{ read(); if(id==="fPrice" && draft.items[0].catalogId){ const c = S.catalog.find(x=>x.id===draft.items[0].catalogId); if(c && +$("fPrice").value !== c.price){ draft.items[0].catalogId = null; draft.source = "quotes"; } } renderDraft(); });
+  const uc = $("useCat"); if(uc) uc.onclick = () => { read(); draft.items[0] = {...draft.items[0], name:cat.name, unitPrice:cat.price, catalogId:cat.id, gst:cat.gst}; draft.source = "catalog"; renderDraft(); };
+  $("startOver").onclick = () => go("new");
+  $("submitReq").onclick = () => {
+    read();
+    const r2 = {id:"R" + S.seq.R++, title: draft.title || draft.items[0].name, dept:draft.dept, requester:{name:"Aman", dept:draft.dept}, items:draft.items.map(x=>({...x})), category:draft.category, city:draft.city, neededBy:draft.neededBy, justification:draft.justification, source: draft.items.every(x=>x.catalogId) ? "catalog" : "quotes", createdAt:Date.now(), status:"pending", aiFields: draft.used ? ["item","qty","price","dept","city","date","category","why"] : [], glCode:GL[draft.dept], raw:draft.raw};
+    r2.total = r2.items.reduce((a,x)=>a+x.qty*x.unitPrice,0);
+    r2.approvals = chainFor(r2).map((s,i)=>({step:s, who:whoFor(s,r2.dept), status:i===0?"pending":"waiting", at:null}));
+    S.requests.unshift(r2); log("Aman", `Raised ${r2.id}: ${r2.title}`, r2.id);
+    draft = null; toast(`${r2.id} submitted. ${r2.approvals[0].who} has been asked to approve.`); go("request-" + r2.id);
+  };
+  $("fill").disabled = false; $("fill").textContent = "Fill the form again"; $("fill").className = "btn ghost";
+}
+
+/* ================= approval card ================= */
+route(/^approve-(R\d+)$/, (id) => {
+  const r = reqById(id); if(!r) return `<div class="empty">Request not found.</div>`;
+  const a = curApproval(r);
+  const b = budget(r.dept), over = r.total > b.left;
+  const past = S.requests.filter(x=>x.requester.name===r.requester.name && x.id!==r.id && ["paid","invoiced","ordered"].includes(x.status));
+  const role = S.role;
+  const mine = a && ROLES[role].step === a.step;
+  const sumId = "sum-" + id;
+  after(async () => {
+    const fb = `${r.requester.name} from ${r.dept} wants ${r.items.map(x=>`${x.qty} × ${x.name}`).join(" and ")} for ${inr(r.total)} before GST, needed by ${d(r.neededBy)}. ${over ? `This takes ${r.dept} ${inr(r.total - b.left)} over this month's budget.` : `It fits the ${r.dept} budget with ${inr(b.left - r.total)} to spare.`}`;
+    const el = $(sumId); if(!el) return;
+    const res = await aiText(`Summarise this purchase request for the approver in 2 short sentences: what and why, cost and budget impact, anything unusual. No em dashes.\n\n${JSON.stringify({requester:r.requester, dept:r.dept, items:r.items, totalBeforeGST:r.total, neededBy:d(r.neededBy), justification:r.justification, budgetLeft:b.left, overBudget:over, pastRequestsByRequester:past.length})}`, fb);
+    if($(sumId)) $(sumId).innerHTML = esc(res.text) + (res.ai ? ` <span class="ai">✦ AI</span>` : "");
+    if(!mine) return;
+    const nextOf = () => { const left = pendingFor(role).filter(x=>x.id!==r.id); return left.length ? "approve-" + left[left.length-1].id : role; };
+    $("apBtn").onclick = () => {
+      a.status = "approved"; a.at = Date.now(); log(ROLES[role].name, `Approved ${r.id} (${a.step})`, r.id);
+      const nx = r.approvals.find(x=>x.status==="waiting");
+      if(nx){ nx.status = "pending"; toast(`Approved. Sent to ${nx.who} (${nx.step}).`); }
+      else { r.status = "approved"; toast(`Approved. ${r.source==="catalog" ? "Procurement will raise the PO." : "Procurement will get quotes."}`); }
+      go(nextOf());
+    };
+    $("rjBtn").onclick = () => modal(`<h3>Reject ${esc(r.id)}?</h3><div class="field"><label>Reason (shared with ${esc(r.requester.name)})</label><textarea id="rjWhy" rows="3"></textarea></div><div class="actions"><button class="btn danger" id="rjYes">Reject request</button><button class="link" onclick="closeModal()">Cancel</button></div>`) || ($("rjYes").onclick = () => { const w = $("rjWhy").value.trim(); if(!w){ $("rjWhy").focus(); return; } a.status = "rejected"; a.at = Date.now(); a.note = w; r.status = "rejected"; log(ROLES[role].name, `Rejected ${r.id}: ${w}`, r.id); closeModal(); toast("Rejected and the requester has been told."); go(nextOf()); });
+    $("qBtn").onclick = () => modal(`<h3>Ask ${esc(r.requester.name)} a question</h3><div class="field"><label>Question</label><textarea id="qTxt" rows="3" placeholder="e.g. Can 10 laptops do for now and 5 in January?"></textarea></div><div class="actions"><button class="btn primary" id="qSend">Send question</button><button class="link" onclick="closeModal()">Cancel</button></div>`) || ($("qSend").onclick = () => { const q = $("qTxt").value.trim(); if(!q) return; log(ROLES[role].name, `Asked on ${r.id}: ${q}`, r.id); a.question = q; closeModal(); toast("Question sent. The request stays in your queue."); render(); });
+  });
+  const left = mine ? pendingFor(role).length : 0;
+  return `<a class="back" href="#${role}">← Back</a>${mine && left>1 ? `<span class="sub" style="margin-left:10px">${left} waiting</span>` : ""}
+    <div class="h1">${esc(r.title)}</div><div class="sub">${r.id} · ${esc(r.requester.name)}, ${esc(r.dept)} · raised ${d(r.createdAt)}</div>${progress(r)}
+    <div class="split"><div class="card" style="margin-top:12px">
+      <div class="row" style="justify-content:space-between"><div><div class="sub">Amount before GST</div><div style="font-size:30px;font-weight:800;letter-spacing:-.02em" class="money">${inr(r.total)}</div></div>${over?`<span class="pill bad">Over budget</span>`:`<span class="pill ok">Within budget</span>`}</div>
+      <p id="${sumId}" style="margin-top:12px;color:var(--ink2)"><span class="spin"></span> Summarising</p>
+      <table style="margin-top:12px"><tr><th>Item</th><th class="n">Qty</th><th class="n">Unit price</th><th class="n">Amount</th></tr>${r.items.map(x=>`<tr><td>${esc(x.name)}${x.catalogId?` <span class="pill teal">Catalog</span>`:""}</td><td class="n">${x.qty}</td><td class="n">${inr(x.unitPrice)}</td><td class="n">${inr(x.qty*x.unitPrice)}</td></tr>`).join("")}</table>
+      <div class="sub" style="margin-top:10px">Needed by ${d(r.neededBy)} · deliver to ${esc(r.city)} · ${esc(r.glCode)}${r.justification?` · "${esc(r.justification)}"`:""}</div>
+      ${a && a.question ? `<div class="warnbox">You asked: "${esc(a.question)}"</div>` : ""}
+      ${mine ? `<div class="actions"><button class="btn primary" id="apBtn">Approve</button><button class="btn ghost" id="rjBtn">Reject</button><button class="link" id="qBtn">Ask a question</button></div>` : a ? `<div class="note">Waiting for ${esc(a.who)} (${esc(a.step)}). Switch role to act on it.</div>` : ""}
+    </div><div>
+      <div class="card" style="margin-top:12px"><h3>Budget impact · ${esc(r.dept)}</h3>
+        <div class="bars" style="margin-top:10px"><i style="width:${Math.min(100,b.used/b.total*100)}%;background:#94a3b8"></i><i style="width:${Math.min(100-Math.min(100,b.used/b.total*100), r.total/b.total*100)}%;background:${over?"var(--red)":"var(--teal)"}"></i></div>
+        <div class="sub" style="margin-top:8px">Used ${lakh(b.used)} · this request ${lakh(r.total)} · left before it ${lakh(b.left)} of ${lakh(b.total)}</div></div>
+      <div class="card"><h3>Approval chain</h3>${r.approvals.map(x=>`<div class="q" style="grid-template-columns:1fr auto"><div><div class="t">${esc(x.step)} · ${esc(x.who)}</div><div class="d">${x.at?d(x.at):""}${x.note?" · "+esc(x.note):""}</div></div><span class="pill ${x.status==="approved"?"ok":x.status==="pending"?"warn":x.status==="rejected"?"bad":""}">${esc(x.status)}</span></div>`).join("")}</div>
+      <div class="card"><h3>${esc(r.requester.name)}'s recent requests</h3>${past.slice(0,3).map(x=>`<div class="q" style="grid-template-columns:1fr auto"><div><div class="t">${esc(x.title)}</div><div class="d">${d(x.createdAt)}</div></div><div class="money">${lakh(x.total)}</div></div>`).join("") || `<div class="sub" style="margin-top:6px">No earlier requests.</div>`}</div>
+    </div></div>`;
+});
+
+/* ================= RFQ + quote comparison ================= */
+route(/^rfq-(R\d+)$/, (id) => {
+  const r = reqById(id); if(!r) return `<div class="empty">Request not found.</div>`;
+  let rfq = rfqFor(r);
+  const head = `<a class="back" href="#procurement">← Back</a><div class="h1">${esc(r.title)}</div><div class="sub">${r.id} · ${r.items[0].qty} × ${esc(r.items[0].name)} · estimate ${lakh(r.total)} · needed by ${d(r.neededBy)} at ${esc(r.city)}</div>${progress(r)}`;
+  if(!rfq){
+    const cands = S.suppliers.filter(s=>s.cat===r.category || (r.category==="Events & print" && s.cat==="Events & print")).concat(S.suppliers.filter(s=>s.cat==="Services & content" && r.category!=="Services & content" && /video|edit|content|writ/i.test(r.items[0].name))).filter((v,i,a)=>a.indexOf(v)===i);
+    const list = (cands.length >= 2 ? cands : S.suppliers.filter(s=>s.cat==="Services & content")).slice(0,4);
+    after(() => {
+      $("sendRfq").onclick = () => {
+        const ids = [...document.querySelectorAll("[data-sup]:checked")].map(x=>x.dataset.sup);
+        if(ids.length < 2){ toast("Pick at least 2 suppliers"); return; }
+        const nr = {id:"RFQ-" + String(Math.max(0,...S.rfqs.map(x=>+x.id.slice(4)))+1).padStart(4,"0"), reqId:r.id, suppliers:ids, sentAt:Date.now(), quotes:[]};
+        S.rfqs.push(nr); r.rfqId = nr.id; r.status = "rfq"; log("Ritu", `Sent ${nr.id} to ${ids.length} suppliers`, r.id);
+        toast("RFQ sent. Quotes are coming in…"); render();
+        setTimeout(() => { // demo: suppliers respond
+          const base = r.items[0].unitPrice;
+          nr.quotes = ids.map((s,i)=>({sup:s, unitPrice: Math.round(base * [0.94,1.02,0.89,0.98][i] / 50) * 50, delivery: Math.min(r.neededBy + [ -8, -12, 6, -4][i]*DAY, r.neededBy + 9*DAY), warranty: /laptop|monitor/i.test(r.items[0].name) ? [1,3,1,2][i] : 0, terms:["Net 30","Net 45","Advance 50%","Net 15"][i]}));
+          log("System", `${nr.quotes.length} quotes received for ${nr.id}`, r.id);
+          if(location.hash === "#rfq-" + r.id) render(); toast(`${nr.quotes.length} quotes are in`);
+        }, 1600);
+      };
+    });
+    return head + `<div class="card"><h2>Send an RFQ</h2><div class="sub">Choose who to ask. Kharid sends each supplier the spec, quantity, delivery date and terms.</div>
+      ${list.map((s,i)=>`<label class="q" style="grid-template-columns:auto 1fr auto;cursor:pointer"><input type="checkbox" data-sup="${s.id}" ${i<3?"checked":""}><div><div class="t">${esc(s.name)}</div><div class="d">${esc(s.cat)} · ${STATE[s.state]} · score ${Math.round((s.onTime+s.accuracy)/2)}/100${s.late?` · ${s.late} late deliveries this quarter`:""}</div></div>${s.status!=="Approved"?`<span class="pill warn">${esc(s.status)}</span>`:""}</label>`).join("")}
+      <div class="actions"><button class="btn primary" id="sendRfq">Send RFQ</button></div></div>`;
+  }
+  if(!rfq.quotes.length) return head + `<div class="card"><div class="empty"><span class="spin"></span> Waiting for quotes from ${rfq.suppliers.length} suppliers</div></div>`;
+  const A = analyseQuotes(r, rfq);
+  let pick = rfq.awarded || A.best.sup;
+  after(() => {
+    document.querySelectorAll("[data-pick]").forEach(x=>x.onchange=()=>{ pick = x.dataset.pick; $("awardBtn").textContent = `Award to ${sup(pick).name}`; });
+    const ab = $("awardBtn"); if(ab) ab.onclick = () => {
+      const q = rfq.quotes.find(x=>x.sup===pick);
+      rfq.awarded = pick;
+      const p = {id:"PO-" + String(S.seq.PO++).padStart(4,"0"), reqId:r.id, sup:pick, lines:[{name:r.items[0].name, qty:r.items[0].qty, unitPrice:q.unitPrice, gst:r.items[0].gst||18}], city:r.city, terms:q.terms, createdAt:Date.now(), status:"draft", warranty:q.warranty, delivery:q.delivery};
+      S.pos.push(p); r.poId = p.id; log("Ritu", `Awarded ${rfq.id} to ${sup(pick).name} (${inr(q.unitPrice)} per unit)`, r.id);
+      toast("Awarded. Your PO is ready to review."); go("po-" + p.id);
+    };
+    const ng = $("negBtn"); if(ng) ng.onclick = async () => {
+      const s = sup(pick), q = rfq.quotes.find(x=>x.sup===pick), low = Math.min(...rfq.quotes.map(x=>x.unitPrice));
+      modal(`<h3>Counter-offer to ${esc(s.name)}</h3><p class="sub"><span class="spin"></span> Drafting</p>`);
+      const target = Math.round(Math.min(q.unitPrice*0.96, low < q.unitPrice ? low : q.unitPrice*0.97)/50)*50;
+      const fb = `Dear ${s.name} team,\n\nThank you for your quote for ${r.items[0].qty} × ${r.items[0].name} at ${inr(q.unitPrice)} per unit.\n\nWe would like to work with you on this order. Could you revise the price to ${inr(target)} per unit, keeping the delivery date of ${d(q.delivery)}${q.warranty?` and the ${q.warranty}-year warranty`:""}? We are ready to issue the PO this week on confirmation.\n\nBest regards,\nRitu\nProcurement Lead, Brightpath Learning`;
+      const res = await aiText(`Write a short, polite counter-offer email from Ritu (Procurement Lead, Brightpath Learning) to ${s.name} about their quote of ${inr(q.unitPrice)} per unit for ${r.items[0].qty} × ${r.items[0].name}. Ask for ${inr(target)} per unit, keep delivery ${d(q.delivery)}${q.warranty?` and the ${q.warranty}-year warranty`:""}, say the PO can be issued this week. Under 110 words, no em dashes, no placeholders.`, fb);
+      $("dialog").innerHTML = `<h3>Counter-offer to ${esc(s.name)} ${res.ai?`<span class="ai">✦ AI</span>`:""}</h3><div class="field"><textarea id="negTxt" rows="11">${esc(res.text)}</textarea></div><div class="actions"><button class="btn primary" id="negSend">Send to ${esc(s.name)}</button><button class="link" onclick="closeModal()">Cancel</button></div><p class="sub" style="margin-top:8px">Demo: nothing is emailed. The message is logged on the request.</p>`;
+      $("negSend").onclick = () => { log("Ritu", `Sent counter-offer to ${s.name} asking ${inr(target)} per unit`, r.id); closeModal(); toast("Counter-offer sent (demo)"); };
+    };
+  });
+  const rowsHtml = (label, f, cls) => `<tr><td class="muted">${label}</td>${A.rows.map(x=>`<td class="n ${cls||""}">${f(x)}</td>`).join("")}</tr>`;
+  return head + `<div class="card"><div class="row" style="justify-content:space-between"><h2>${A.rows.length} quotes · ${esc(rfq.id)}</h2><span class="sub">Sent ${d(rfq.sentAt)}</span></div>
+    <div class="note" style="background:#f1ebff;color:#3b1a7a"><b>Recommended: ${esc(A.best.s.name)}</b> <span class="pill teal" style="margin-left:6px">3-year cost</span><ul style="margin:6px 0 0 18px">${A.reasons.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div style="overflow-x:auto;margin-top:14px"><table>
+      <tr><th></th>${A.rows.map(x=>`<th class="n"><label style="cursor:pointer"><input type="radio" name="pk" data-pick="${x.sup}" ${x.sup===pick?"checked":""} ${rfq.awarded?"disabled":""}> ${esc(x.s.name)}</label>${x===A.best?` <span class="pill ok">Best value</span>`:""}</th>`).join("")}</tr>
+      ${rowsHtml("Unit price", x=>inr(x.unitPrice))}
+      ${rowsHtml(`Subtotal (${r.items[0].qty} units)`, x=>inr(x.base))}
+      ${rowsHtml("GST", x=>`${inr(x.tax)} <span class="muted">${CO.sites[r.city].state===x.s.state?"CGST+SGST":"IGST"}</span>`)}
+      ${rowsHtml("<b>Total with GST</b>", x=>`<b>${inr(x.total)}</b>`)}
+      ${rowsHtml("Delivery", x=>`${d(x.delivery)} ${x.late?`<span class="pill bad">Late</span>`:`<span class="pill ok">On time</span>`}`)}
+      ${A.hw ? rowsHtml("Warranty", x=>`${x.warranty} year${x.warranty>1?"s":""}`) : ""}
+      ${A.hw ? rowsHtml("Expected repairs outside warranty, 3 yrs", x=>x.repair?inr(x.repair):"₹0") : ""}
+      ${rowsHtml("<b>3-year cost</b>", x=>`<b>${inr(x.tco)}</b>`)}
+      ${rowsHtml("Payment terms", x=>esc(x.terms))}
+      ${rowsHtml("Supplier score", x=>`${x.rating}/100`)}
+    </table></div>
+    ${rfq.awarded ? `<div class="okbox">Awarded to ${esc(sup(rfq.awarded).name)}. <a href="#po-${esc(r.poId)}">Open the PO</a></div>` : `<div class="actions"><button class="btn primary" id="awardBtn">Award to ${esc(sup(pick).name)}</button><button class="link" id="negBtn">Negotiate first</button></div>`}
+    <div class="sub" style="margin-top:10px">3-year cost adds an estimate for repairs outside warranty (5% of the unit price a year for hardware).${A.savings>0?` Savings vs the highest quote: ${inr(A.savings)}.`:""}</div></div>`;
+});
+
+/* ================= PO ================= */
+route(/^createpo-(R\d+)$/, (id) => {
+  const r = reqById(id); if(!r) return "";
+  const c = S.catalog.find(x=>x.id===r.items[0].catalogId);
+  const p = {id:"PO-" + String(S.seq.PO++).padStart(4,"0"), reqId:r.id, sup:c ? c.sup : "S8", lines:r.items.map(x=>({name:x.name, qty:x.qty, unitPrice:x.unitPrice, gst:x.gst||18})), city:r.city, terms:"Net 30", createdAt:Date.now(), status:"draft"};
+  S.pos.push(p); r.poId = p.id; log("Ritu", `Created ${p.id} from catalog`, r.id);
+  setTimeout(()=>go("po-" + p.id), 0); return "";
+});
+route(/^po-(PO-\d+)$/, (id) => {
+  const p = poById(id); if(!p) return `<div class="empty">PO not found.</div>`;
+  const r = reqById(p.reqId), s = sup(p.sup), g = gstSplit(p.lines, p.city, p.sup), site = CO.sites[p.city];
+  after(() => { const b = $("sendPO"); if(b) b.onclick = () => { p.status = "sent"; p.sentAt = Date.now(); r.status = "ordered"; log("Ritu", `Sent ${p.id} to ${s.name}`, r.id); toast(`${p.id} sent to ${s.name}`); go("procurement"); }; });
+  return `<a class="back" href="#procurement">← Back</a><div class="h1">Purchase order ${esc(p.id)}</div><div class="sub">For ${r.id} · ${esc(r.title)}</div>${progress(r)}
+    <div class="split"><div class="doc" style="margin-top:12px">
+      <div class="row" style="justify-content:space-between;align-items:flex-start"><div><h1>PURCHASE ORDER</h1><div class="muted">${esc(p.id)} · ${d(p.createdAt)}</div></div><div class="right"><b>${esc(CO.name)}</b><div class="muted" style="max-width:260px">${esc(site.addr)}</div><div class="muted">GSTIN ${site.gstin}</div></div></div>
+      <div class="grid2" style="margin-top:18px"><div><div class="muted">Supplier</div><b>${esc(s.name)}</b><div class="muted">${STATE[s.state]} · GSTIN ${esc(s.gstin)}</div></div><div><div class="muted">Deliver to</div><b>${esc(p.city)} office</b><div class="muted">By ${d(p.delivery || r.neededBy)} · Terms ${esc(p.terms)}${p.warranty?` · Warranty ${p.warranty} yr`:""}</div></div></div>
+      <table style="margin-top:18px"><tr><th>#</th><th>Item</th><th class="n">Qty</th><th class="n">Rate</th><th class="n">GST</th><th class="n">Amount</th></tr>
+        ${p.lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td class="n">${l.qty.toLocaleString("en-IN")}</td><td class="n">${inr(l.unitPrice)}</td><td class="n">${l.gst}%</td><td class="n">${inr(l.qty*l.unitPrice)}</td></tr>`).join("")}
+        <tr><td colspan="5" class="right muted">Subtotal</td><td class="n">${inr(g.base)}</td></tr>
+        ${g.intra ? `<tr><td colspan="5" class="right muted">CGST</td><td class="n">${inr(g.cgst)}</td></tr><tr><td colspan="5" class="right muted">SGST</td><td class="n">${inr(g.sgst)}</td></tr>` : `<tr><td colspan="5" class="right muted">IGST (inter-state)</td><td class="n">${inr(g.igst)}</td></tr>`}
+        <tr><td colspan="5" class="right"><b>Total</b></td><td class="n"><b>${inr(g.total)}</b></td></tr></table>
+      <div class="muted" style="margin-top:14px">Approved by ${r.approvals.filter(a=>a.status==="approved").map(a=>`${esc(a.who)} (${esc(a.step)})`).join(", ")}. Quote ${r.rfqId?esc(r.rfqId):"from catalog rate"}.</div>
+    </div><div class="card" style="margin-top:12px">${p.status==="draft" ? `<h2>Ready to send</h2><p class="sub" style="margin-top:6px">Check the supplier, quantities and totals. Sending emails the PO to ${esc(s.name)} and commits ${inr(g.base)} against ${esc(r.dept)}'s budget.</p><div class="actions"><button class="btn primary" id="sendPO">Send PO to supplier</button></div><p class="sub" style="margin-top:10px">Demo: nothing is emailed.</p>` : `<h2>Sent ${p.sentAt?d(p.sentAt):""}</h2><p class="sub" style="margin-top:6px">Status: ${esc(p.status)}.</p><div class="actions"><a class="btn ghost" href="#request-${esc(r.id)}">Open the request</a></div>`}</div></div>`;
+});
+
+/* ================= receipt ================= */
+route(/^receive-(PO-\d+)$/, (id) => {
+  const p = poById(id); if(!p) return "";
+  const r = reqById(p.reqId), rec = receivedQty(p);
+  after(() => { const b = $("recBtn"); if(b) b.onclick = () => {
+    const q = p.lines.map((l,i)=>Math.max(0, Math.min(+$("rq"+i).value||0, l.qty - rec[i])));
+    if(q.every(x=>x===0)){ toast("Enter what arrived"); return; }
+    S.receipts.push({poId:p.id, lines:p.lines.map((l,i)=>({name:l.name, qty:q[i]})), at:Date.now(), by:ROLES[S.role].name, condition:$("rcond").value});
+    const now = receivedQty(p), full = now.every((x,i)=>x>=p.lines[i].qty);
+    p.status = full ? "received" : "partially received"; if(full && r.status==="ordered") r.status = "received";
+    log(ROLES[S.role].name, `Recorded receipt on ${p.id}: ${q.join(", ")} (${$("rcond").value})`, r.id);
+    toast(full ? "Everything's in. Finance can now match the invoice." : `Partial delivery recorded. ${p.lines.map((l,i)=>l.qty-now[i]).reduce((a,b)=>a+b,0)} still to come.`); go(S.role);
+  }; });
+  return `<a class="back" href="#${S.role}">← Back</a><div class="h1">Confirm what arrived</div><div class="sub">${esc(p.id)} · ${esc(sup(p.sup).name)} · ${esc(r.title)}</div>${progress(r)}
+    <div class="card"><table><tr><th>Item</th><th class="n">Ordered</th><th class="n">Already received</th><th class="n">Received now</th></tr>
+    ${p.lines.map((l,i)=>`<tr><td>${esc(l.name)}</td><td class="n">${l.qty}</td><td class="n">${rec[i]}</td><td class="n"><input id="rq${i}" type="number" min="0" max="${l.qty-rec[i]}" value="${l.qty-rec[i]}" style="width:90px;text-align:right;border:1px solid var(--line);border-radius:8px;padding:6px"></td></tr>`).join("")}</table>
+    <div class="field" style="max-width:260px"><label>Condition</label><select id="rcond"><option>Good</option><option>Some damaged</option><option>Wrong items</option></select></div>
+    ${rec.every((x,i)=>x>=p.lines[i].qty) ? `<div class="okbox">Everything on this PO has been received.</div>` : `<div class="actions"><button class="btn primary" id="recBtn">Confirm receipt</button></div>`}</div>`;
+});
+
+/* ================= invoice ================= */
+route(/^invoice-(INV-\d+)$/, (id) => {
+  const i = invById(id); if(!i) return `<div class="empty">Invoice not found.</div>`;
+  const p = poById(i.poId), r = reqById(p.reqId), s = sup(i.sup), m = matchInvoice(i), g = gstSplit(i.lines, p.city, i.sup);
+  const AIx = i.source==="upload" && i.ai ? ` <span class="ai">✦ AI</span>` : i.source==="upload" ? ` <span class="ai" style="background:#eef0f3;color:#6b7280">read</span>` : "";
+  after(() => {
+    const ap = $("apPay"); if(ap) ap.onclick = () => { i.status = "approved"; r.status = "invoiced"; log("Karan", `Approved ${i.number} for payment (3-way match ${m.state==="matched"?"passed":"overridden"})`, r.id); toast("Approved for payment"); go("finance"); };
+    const hd = $("hold"); if(hd) hd.onclick = () => { i.status = "hold"; log("Karan", `Put ${i.number} on hold`, r.id); toast("On hold"); go("finance"); };
+    const dup = $("rejDup"); if(dup) dup.onclick = () => { i.status = "rejected"; log("Karan", `Rejected ${i.number} as a duplicate of ${m.dup.number}`, r.id); toast("Rejected as duplicate. Nothing will be paid twice."); go("finance"); };
+    const ov = $("override"); if(ov) ov.onclick = () => { modal(`<h3>Override the mismatch?</h3><p class="sub" style="margin-top:6px">This approves ${esc(i.number)} for ${inr(invTotal(i))} despite the differences. The reason is saved in the audit trail.</p><div class="field"><label>Reason</label><textarea id="ovWhy" rows="3"></textarea></div><div class="actions"><button class="btn danger" id="ovYes">Approve anyway</button><button class="link" onclick="closeModal()">Cancel</button></div>`); $("ovYes").onclick = () => { const w = $("ovWhy").value.trim(); if(!w){ $("ovWhy").focus(); return; } i.status = "approved"; i.override = w; r.status = "invoiced"; log("Karan", `Overrode mismatch on ${i.number}: ${w}`, r.id); closeModal(); toast("Approved with override"); go("finance"); }; };
+    const cn = $("credit"); if(cn) cn.onclick = async () => {
+      modal(`<h3>Ask ${esc(s.name)} for a credit note</h3><p class="sub"><span class="spin"></span> Drafting</p>`);
+      const fb = `Dear ${s.name} accounts team,\n\nThank you for invoice ${i.number} dated ${d(i.date)} against our PO ${p.id}.\n\nWe found the following differences:\n${m.issues.map(x=>"- "+x).join("\n")}\n\nPlease send a credit note for ${inr(Math.max(0,m.over))} (or a revised invoice) so we can process payment within the agreed terms.\n\nBest regards,\nKaran\nAccounts, Brightpath Learning`;
+      const res = await aiText(`Write a short, polite email from Karan (Accounts, Brightpath Learning) to ${s.name} asking for a credit note or revised invoice. Invoice ${i.number} dated ${d(i.date)}, PO ${p.id}. Differences: ${m.issues.join(" ")} Amount to credit: ${inr(Math.max(0,m.over))}. Under 130 words, list the differences, no em dashes, no placeholders.`, fb);
+      $("dialog").innerHTML = `<h3>Credit note request ${res.ai?`<span class="ai">✦ AI</span>`:""}</h3><div class="field"><textarea id="cnTxt" rows="13">${esc(res.text)}</textarea></div><div class="actions"><button class="btn primary" id="cnSend">Send and put invoice on hold</button><button class="link" onclick="closeModal()">Cancel</button></div><p class="sub" style="margin-top:8px">Demo: nothing is emailed.</p>`;
+      $("cnSend").onclick = () => { i.status = "hold"; i.creditAsked = Date.now(); log("Karan", `Requested a credit note of ${inr(Math.max(0,m.over))} on ${i.number}`, r.id); closeModal(); toast("Credit note requested. The invoice is on hold."); go("finance"); };
+    };
+  });
+  const res = m.state==="matched" ? `<div class="okbox"><b>3-way match passed.</b> Quantities, prices and GST agree with ${esc(p.id)} and what was received.</div>`
+    : m.state==="duplicate" ? `<div class="badbox"><b>Possible duplicate.</b> ${esc(m.msg)}</div>`
+    : `<div class="badbox"><b>3-way match found ${m.issues.length} problem${m.issues.length>1?"s":""}.</b><ul style="margin:6px 0 0 18px">${m.issues.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${m.over>0?`<div style="margin-top:6px">Overbilled by <b>${inr(m.over)}</b> including GST.</div>`:""}</div>`;
+  const acts = i.status==="approved" ? `<div class="note">Approved for payment. <a href="#pay-${esc(i.id)}">Record the payment</a></div>` : i.status==="paid" ? `<div class="okbox">Paid.</div>` : i.status==="rejected" ? `<div class="note">Rejected.</div>`
+    : m.state==="matched" ? `<div class="actions"><button class="btn primary" id="apPay">Approve for payment</button><button class="link" id="hold">Hold</button></div>`
+    : m.state==="duplicate" ? `<div class="actions"><button class="btn primary" id="rejDup">Reject as duplicate</button><button class="link" id="hold">Hold to check</button></div>`
+    : `<div class="actions"><button class="btn primary" id="credit">Request a credit note</button><button class="btn ghost" id="hold">Hold</button><button class="link" id="override">Override with a reason</button></div>${i.creditAsked?`<div class="warnbox">Credit note requested ${d(i.creditAsked)}. Waiting for the supplier.</div>`:""}`;
+  return `<a class="back" href="#finance">← Back</a><div class="h1">${esc(s.name)} · ${esc(i.number)}</div><div class="sub">${esc(p.id)} · ${esc(r.title)} · ${r.id}</div>${progress(r)}
+    ${res}
+    <div class="split"><div class="card"><h2>3-way match</h2><table style="margin-top:8px"><tr><th>Item</th><th class="n">PO qty</th><th class="n">Received</th><th class="n">Invoiced</th><th class="n">PO rate</th><th class="n">Invoice rate</th></tr>
+      ${m.lines.map(l=>`<tr><td>${esc(l.name)}</td><td class="n">${l.poQty.toLocaleString("en-IN")}</td><td class="n">${l.rec.toLocaleString("en-IN")}</td><td class="n" style="${l.qOk?"":"color:var(--red);font-weight:800"}">${l.invQty.toLocaleString("en-IN")}</td><td class="n">${inr(l.poPrice)}</td><td class="n" style="${l.pOk?"":"color:var(--red);font-weight:800"}">${inr(l.invPrice)}</td></tr>`).join("")}</table>
+      ${acts}</div>
+    <div class="card"><h2>Invoice details${AIx}</h2><table style="margin-top:8px">
+      <tr><td class="muted">Supplier</td><td>${esc(s.name)}</td></tr><tr><td class="muted">GSTIN</td><td>${esc(i.gstin || s.gstin)}</td></tr><tr><td class="muted">Invoice no.</td><td>${esc(i.number)}</td></tr><tr><td class="muted">Date</td><td>${d(i.date)}</td></tr><tr><td class="muted">Due</td><td>${d(i.due)}</td></tr>
+      <tr><td class="muted">Subtotal</td><td class="money">${inr(g.base)}</td></tr><tr><td class="muted">${g.intra?"CGST + SGST":"IGST"}</td><td class="money">${inr(g.tax)}</td></tr><tr><td><b>Total</b></td><td class="money"><b>${inr(g.total)}</b></td></tr></table></div></div>`;
+});
+route(/^upload$/, () => {
+  const open = S.pos.filter(p=>p.status!=="draft" && p.status!=="closed");
+  after(() => {
+    let file = null;
+    $("upFile").onchange = e => { file = e.target.files[0] || null; $("upName").textContent = file ? file.name : ""; };
+    $("upSample").onclick = () => makeInvoice(null);
+    $("upGo").onclick = () => { if(!file){ toast("Choose a file, or try a sample invoice"); return; } makeInvoice(file); };
+    async function makeInvoice(f){
+      const p = poById($("upPO").value); if(!p) return;
+      const btn = f ? $("upGo") : $("upSample"); btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Reading`;
+      const rec = receivedQty(p);
+      let lines = p.lines.map((l,i)=>({...l, qty: rec[i] || l.qty})), number = sup(p.sup).name.split(" ").map(w=>w[0]).join("") + "/" + (7000 + S.invoices.length), ai = false, gstin = sup(p.sup).gstin, date = Date.now();
+      if(f && sample && /^image\//.test(f.type)){
+        try{
+          const lim = sample.limits ? await sample.limits() : null;
+          if(!lim || lim.images){
+            const x = await sample.json(`Read this supplier invoice and return JSON {"number": string, "date": "YYYY-MM-DD", "gstin": string, "lines": [{"name": string, "qty": number, "unitPrice": number (before tax), "gst": number percent}]}. Only what is printed on the invoice.`, {images:[f], modelTier:"quick"});
+            if(x && Array.isArray(x.lines) && x.lines.length){ number = x.number || number; gstin = x.gstin || gstin; date = Date.parse(x.date) || date; lines = p.lines.map((l,i)=>({name:l.name, qty:+(x.lines[i]?.qty ?? l.qty), unitPrice:+(x.lines[i]?.unitPrice ?? l.unitPrice), gst:+(x.lines[i]?.gst ?? l.gst)})); ai = true; }
+          }
+        }catch(e){}
+      }
+      const inv = {id:"INV-" + String(S.seq.INV++).padStart(4,"0"), poId:p.id, sup:p.sup, number, date, gstin, lines, status:"to_match", source:"upload", ai, due: date + 30*DAY};
+      S.invoices.push(inv); log("Karan", `Added invoice ${number} for ${p.id}${ai?" (read by AI)":""}`, p.reqId);
+      if(f && !ai) toast("Couldn't read that file automatically. Check the details against the invoice.");
+      go("invoice-" + inv.id);
+    }
+  });
+  return `<a class="back" href="#finance">← Back</a><div class="h1">Add an invoice</div><div class="sub">Drop in the supplier's invoice. Kharid reads it and matches it against the PO and receipt.</div>
+    <div class="card"><div class="field" style="max-width:520px"><label>Purchase order</label><select id="upPO">${open.map(p=>`<option value="${p.id}">${p.id} · ${esc(sup(p.sup).name)} · ${esc(reqById(p.reqId).title)}</option>`).join("")}</select></div>
+      <div class="actions"><label class="btn ghost" style="cursor:pointer">Choose invoice image<input type="file" id="upFile" accept="image/*,application/pdf" hidden></label><span id="upName" class="sub"></span></div>
+      <div class="actions"><button class="btn primary" id="upGo">Read and match</button><button class="link" id="upSample">Try a sample invoice instead</button></div>
+      <p class="sub" style="margin-top:10px">Invoice images are read with Claude when available. PDFs and other files use the PO's details for you to check.</p></div>`;
+});
+
+/* ================= pay ================= */
+route(/^pay-(INV-\d+)$/, (id) => {
+  const i = invById(id); if(!i) return "";
+  const p = poById(i.poId), r = reqById(p.reqId), s = sup(i.sup);
+  after(() => { const b = $("payBtn"); if(b) b.onclick = () => {
+    const utr = $("utr").value.trim(); if(!/^[A-Z0-9]{8,22}$/i.test(utr)){ $("utr").focus(); toast("Enter the bank UTR reference"); return; }
+    i.status = "paid"; S.payments.push({invId:i.id, utr, at:Date.now(), amount:invTotal(i)});
+    const allPaid = S.invoices.filter(x=>x.poId===p.id && x.status!=="rejected").every(x=>x.status==="paid") && receivedQty(p).every((q,k)=>q>=p.lines[k].qty);
+    if(allPaid){ r.status = "paid"; p.status = "closed"; }
+    log("Karan", `Paid ${i.number} · ${inr(invTotal(i))} · ${utr}`, r.id); toast(allPaid ? `Paid. ${r.id} is complete.` : "Paid. The PO stays open for the remaining delivery."); go("finance");
+  }; });
+  return `<a class="back" href="#finance">← Back</a><div class="h1">Pay ${esc(s.name)}</div><div class="sub">${esc(i.number)} · ${esc(p.id)} · due ${d(i.due)}</div>${progress(r)}
+    <div class="card" style="max-width:560px"><div class="sub">Amount</div><div style="font-size:30px;font-weight:800" class="money">${inr(invTotal(i))}</div>
+      <div class="sub" style="margin-top:8px">${s.bank ? "Bank details verified on the supplier record." : "Bank details missing on the supplier record."}${s.msme ? " MSME supplier: pay within 45 days." : ""}</div>
+      ${i.status==="paid" ? `<div class="okbox">Paid.</div>` : `<div class="field"><label>Bank UTR reference</label><input id="utr" value="UTR${Math.floor(4800000000 + Math.random()*99999999)}"></div><div class="actions"><button class="btn primary" id="payBtn">Mark as paid</button></div>`}</div>`;
+});
+
+/* ================= request timeline ================= */
+route(/^request-(R\d+)$/, (id) => {
+  const r = reqById(id); if(!r) return `<div class="empty">Request not found.</div>`;
+  const rfq = rfqFor(r), p = poById(r.poId), recs = p ? S.receipts.filter(x=>x.poId===p.id) : [], invs = p ? S.invoices.filter(x=>x.poId===p.id) : [], pays = S.payments.filter(x=>invs.some(i=>i.id===x.invId));
+  const aud = S.audit.filter(a=>a.ref===r.id);
+  const AI = f => r.aiFields.includes(f) ? ` <span class="ai">✦ AI</span>` : "";
+  return `<a class="back" href="#${S.role}">← Back</a><div class="row" style="justify-content:space-between"><div><div class="h1">${esc(r.title)}</div><div class="sub">${r.id} · ${esc(r.requester.name)}, ${esc(r.dept)} · ${d(r.createdAt)}</div></div>${statusPill(r)}</div>${progress(r)}
+    <div class="note">${esc(nextFor(r))}</div>
+    <div class="split"><div>
+      <div class="card"><h2>Request</h2>${r.raw?`<div class="sub" style="margin-top:4px">They wrote: "${esc(r.raw)}"</div>`:""}
+        <table style="margin-top:8px"><tr><th>Item${AI("item")}</th><th class="n">Qty${AI("qty")}</th><th class="n">Unit price${AI("price")}</th><th class="n">Amount</th></tr>${r.items.map(x=>`<tr><td>${esc(x.name)}</td><td class="n">${x.qty}</td><td class="n">${inr(x.unitPrice)}</td><td class="n">${inr(x.qty*x.unitPrice)}</td></tr>`).join("")}</table>
+        <div class="sub" style="margin-top:8px">Needed by ${d(r.neededBy)}${AI("date")} · ${esc(r.city)}${AI("city")} · ${esc(r.glCode)} · ${r.source==="catalog"?"Catalog":"Quotes"}</div></div>
+      <div class="card"><h2>Approvals</h2>${r.approvals.map(x=>`<div class="q" style="grid-template-columns:1fr auto"><div><div class="t">${esc(x.step)} · ${esc(x.who)}</div><div class="d">${x.at?d(x.at):""}${x.note?" · "+esc(x.note):""}</div></div><span class="pill ${x.status==="approved"?"ok":x.status==="pending"?"warn":x.status==="rejected"?"bad":""}">${esc(x.status)}</span></div>`).join("")}${r.status==="pending" && ROLES[S.role].step===curApproval(r)?.step ? `<div class="actions"><button class="btn primary" data-go="approve-${r.id}">Review</button></div>`:""}</div>
+      <div class="card"><h2>Documents</h2>
+        ${rfq?qrow(`Quotes · ${esc(rfq.id)}`, `${rfq.quotes.length} quotes${rfq.awarded?` · awarded to ${esc(sup(rfq.awarded).name)}`:""}`, "", "Open", "rfq-"+r.id):""}
+        ${p?qrow(`Purchase order · ${esc(p.id)}`, `${esc(sup(p.sup).name)} · ${inr(poTotal(p))} · ${esc(p.status)}`, "", "Open", "po-"+p.id):""}
+        ${recs.map(x=>qrow(`Goods receipt · ${d(x.at)}`, `${x.lines.map(l=>l.qty).join(", ")} received · ${esc(x.condition)} · by ${esc(x.by)}`, "", "", "")).join("")}
+        ${invs.map(x=>qrow(`Invoice · ${esc(x.number)}`, `${inr(invTotal(x))} · ${esc(x.status.replace("_"," "))}`, "", "Open", "invoice-"+x.id)).join("")}
+        ${pays.map(x=>qrow(`Payment · ${esc(x.utr)}`, `${inr(x.amount)} · ${d(x.at)}`, "", "", "")).join("")}
+        ${!rfq && !p ? `<div class="sub" style="margin-top:6px">No documents yet.</div>`:""}</div>
+    </div><div class="card"><h2>Audit trail</h2><ul class="audit" style="margin-top:6px">${aud.map(a=>`<li><span>${d(a.at)} ${new Date(a.at).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</span>${esc(a.who)}: ${esc(a.what)}</li>`).join("") || "<li>No entries.</li>"}</ul></div></div>`;
+});
+route(/^requests$/, () => `<div class="h1">All requests</div><div class="card"><table><tr><th>Request</th><th>Department</th><th class="n">Amount</th><th>Stage</th><th></th></tr>${S.requests.map(r=>`<tr><td><b>${esc(r.title)}</b><div class="sub">${r.id} · ${esc(r.requester.name)} · ${d(r.createdAt)}</div></td><td>${esc(r.dept)}</td><td class="n">${lakh(r.total)}</td><td>${statusPill(r)}<div class="sub">${esc(nextFor(r))}</div></td><td><a href="#request-${r.id}">Open</a></td></tr>`).join("")}</table></div>`);
+
+/* ================= supporting modules ================= */
+route(/^suppliers$/, () => `<div class="h1">Suppliers</div><div class="sub">Ratings come from past orders: on-time delivery and invoice accuracy.</div><div class="card"><table><tr><th>Supplier</th><th>Category</th><th>GSTIN</th><th class="n">Score</th><th class="n">Spend this month</th><th>Flags</th></tr>
+  ${S.suppliers.map(s=>{ const spend = S.pos.filter(p=>p.sup===s.id).reduce((a,p)=>a+gstSplit(p.lines,p.city,p.sup).base,0); const flags = []; if(!GSTIN_RE.test(s.gstin)) flags.push(["GSTIN format invalid","bad"]); if(!s.bank) flags.push(["Bank details missing","warn"]); if(s.late) flags.push([`${s.late} late deliveries this quarter`,"warn"]); if(s.status!=="Approved") flags.push([s.status,"warn"]); if(s.msme) flags.push(["MSME","teal"]);
+    return `<tr><td><b>${esc(s.name)}</b><div class="sub">${STATE[s.state]} · PAN ${esc(s.pan)}</div></td><td>${esc(s.cat)}</td><td class="num">${esc(s.gstin)}</td><td class="n">${Math.round((s.onTime+s.accuracy)/2)}</td><td class="n">${spend?lakh(spend):"·"}</td><td>${flags.map(f=>`<span class="pill ${f[1]}">${esc(f[0])}</span>`).join(" ")}</td></tr>`; }).join("")}</table></div>`);
+route(/^budgets$/, () => `<div class="h1">Budgets · this month</div><div class="sub">Committed = open POs. Paid = invoices paid. Alerts at 80%.</div><div class="card"><table><tr><th>Department</th><th class="n">Budget</th><th class="n">Committed</th><th class="n">Paid</th><th class="n">Left</th><th style="width:30%">Used</th></tr>
+  ${Object.keys(S.depts).map(k=>{ const b = budget(k), pc = b.used/b.total*100; return `<tr><td><b>${k}</b></td><td class="n">${lakh(b.total)}</td><td class="n">${lakh(b.committed)}</td><td class="n">${lakh(b.paid)}</td><td class="n" style="${b.left<0?"color:var(--red);font-weight:800":""}">${b.left<0?"−":""}${lakh(Math.abs(b.left))}</td><td><div class="bars"><i style="width:${Math.min(100,b.paid/b.total*100)}%;background:var(--teal)"></i><i style="width:${Math.min(100-Math.min(100,b.paid/b.total*100), b.committed/b.total*100)}%;background:#5eead4"></i></div><div class="sub">${Math.round(pc)}% ${pc>=80?`<span class="pill ${pc>=100?"bad":"warn"}">${pc>=100?"Over":"Over 80%"}</span>`:""}</div></td></tr>`; }).join("")}</table></div>`);
+route(/^contracts$/, () => `<div class="h1">Contracts</div><div class="card"><table><tr><th>Contract</th><th>Supplier</th><th>Owner</th><th class="n">Value</th><th>Ends</th><th></th></tr>
+  ${S.contracts.slice().sort((a,b)=>a.end-b.end).map(c=>{ const dl = Math.round((c.end-NOW)/DAY); return `<tr><td><b>${esc(c.name)}</b></td><td>${esc(sup(c.sup).name)}</td><td>${esc(c.owner)}</td><td class="n">${lakh(c.value)}</td><td>${d(c.end)}</td><td>${dl<=60?`<span class="pill warn">Renews in ${dl} days: review now</span>`:`<span class="pill">${dl} days left</span>`}</td></tr>`; }).join("")}</table></div>`);
+route(/^catalog$/, () => `<div class="h1">Catalog</div><div class="sub">Preferred items at fixed prices. Catalog requests skip quotes.</div><div class="card"><table><tr><th>Item</th><th>Category</th><th>Supplier</th><th class="n">Price</th><th class="n">GST</th></tr>${S.catalog.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.cat)}</td><td>${esc(sup(c.sup).name)}</td><td class="n">${inr(c.price)}</td><td class="n">${c.gst}%</td></tr>`).join("")}</table></div>`);
+route(/^settings$/, () => {
+  after(() => { $("saveSet").onclick = () => { const a = +$("lim1").value, b = +$("lim2").value; if(!(a>0 && b>a)){ toast("The second limit must be higher than the first"); return; } S.settings.deptLimit = a; S.settings.financeLimit = b; log(ROLES[S.role].name, `Changed approval limits to ${inr(a)} / ${inr(b)}`, "settings"); toast("Saved. New requests use these limits."); }; $("reset2").onclick = () => { seed(); toast("Demo reset"); go(S.role); }; });
+  return `<div class="h1">Settings</div><div class="card" style="max-width:640px"><h2>Approval matrix</h2>
+    <div class="grid2"><div class="field"><label>Department head alone, up to (INR)</label><input id="lim1" type="number" value="${S.settings.deptLimit}"></div><div class="field"><label>Department head + finance, up to (INR)</label><input id="lim2" type="number" value="${S.settings.financeLimit}"></div></div>
+    <p class="sub" style="margin-top:10px">Above that, or over the department's budget: department head, finance, then CFO.</p>
+    <div class="actions"><button class="btn primary" id="saveSet">Save limits</button><button class="link" id="reset2">Reset demo data</button></div></div>
+    <div class="card" style="max-width:640px"><h2>GL codes</h2><table>${Object.entries(GL).map(([k,v])=>`<tr><td>${k}</td><td>${esc(v)}</td></tr>`).join("")}</table></div>`;
+});
+
+/* ================= spend ================= */
+function insight(){
+  const rows = Object.keys(S.depts).map(k=>({k, b:budget(k)})).map(x=>({...x, pc:x.b.used/x.b.total}));
+  const hot = rows.sort((a,b)=>b.pc-a.pc)[0];
+  const dLeft = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate() - new Date().getDate();
+  return `${hot.k} is at ${Math.round(hot.pc*100)}% of its budget with ${dLeft} days left in the month${pendingFor("approver").some(r=>r.dept===hot.k)?", and has requests still waiting":""}.`;
+}
+function bars(items, max){ return items.map(x=>`<div style="margin-top:10px"><div class="row" style="justify-content:space-between"><b style="font-size:13.5px">${esc(x.label)}</b><span class="sub money">${lakh(x.v)}${x.of?` of ${lakh(x.of)}`:""}</span></div><div class="bar" style="margin-top:4px"><i style="width:${Math.min(100,x.v/max*100)}%" class="${x.of && x.v > x.of ? "over" : ""}"></i></div></div>`).join(""); }
+function spendBody(compact){
+  const deps = Object.keys(S.depts).map(k=>({label:k, v:budget(k).used, of:S.depts[k]}));
+  const cats = {}; S.pos.forEach(p=>{ const r = reqById(p.reqId); const c = r.category || (S.catalog.find(x=>x.id===r.items[0].catalogId)||{}).cat || "Other"; cats[c] = (cats[c]||0) + gstSplit(p.lines,p.city,p.sup).base; });
+  const supSpend = {}; S.pos.forEach(p=>{ supSpend[p.sup] = (supSpend[p.sup]||0) + gstSplit(p.lines,p.city,p.sup).base; });
+  const committed = Object.keys(S.depts).reduce((a,k)=>a+budget(k).committed,0), paid = Object.keys(S.depts).reduce((a,k)=>a+budget(k).paid,0);
+  const savings = S.rfqs.filter(x=>x.awarded).reduce((a,x)=>{ const r = reqById(x.reqId); const q = x.quotes.map(q=>q.unitPrice*r.items[0].qty); const aw = x.quotes.find(q=>q.sup===x.awarded).unitPrice*r.items[0].qty; return a + Math.max(...q) - aw; },0);
+  const cyc = S.pos.filter(p=>p.sentAt).map(p=>(p.sentAt - reqById(p.reqId).createdAt)/DAY); const avg = cyc.reduce((a,b)=>a+b,0)/Math.max(1,cyc.length);
+  const invNoPo = S.invoices.filter(i=>!poById(i.poId)).length;
+  const pct = Math.round(100 * (1 - invNoPo / Math.max(1,S.invoices.length)));
+  return `<div class="grid5" style="margin-top:18px">
+      <div class="kpi"><b>${lakh(committed)}</b><span>Committed (open POs)</span></div>
+      <div class="kpi"><b>${lakh(paid)}</b><span>Paid this month</span></div>
+      <div class="kpi"><b>${lakh(savings)}</b><span>Saved through quotes</span></div>
+      <div class="kpi"><b>${avg.toFixed(1)} days</b><span>Request to PO, average</span></div>
+      <div class="kpi"><b>${pct}%</b><span>Invoices with a PO</span></div></div>
+    <div class="note"><b>What to look at:</b> ${esc(insight())}</div>
+    <div class="grid2"><div class="card"><h2>By department vs budget</h2>${bars(deps, Math.max(...deps.map(x=>Math.max(x.v,x.of))))}</div>
+      <div class="card"><h2>By category</h2>${bars(Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:k,v})), Math.max(...Object.values(cats)))}
+        <h2 style="margin-top:20px">Top suppliers</h2>${Object.entries(supSpend).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`<div class="q" style="grid-template-columns:1fr auto"><div class="t">${esc(sup(k).name)}</div><div class="money">${lakh(v)}</div></div>`).join("")}</div></div>`;
+}
+route(/^spend$/, () => `<div class="h1">Spend this month</div><div class="sub">Every rupee here went through a request, an approval and a PO.</div>${spendBody()}`);
+
+/* ================= export ================= */
+document.addEventListener("click", e => {
+  if(e.target.id !== "exportBtn") return;
+  const rows = S.invoices.filter(i=>["approved","paid"].includes(i.status)).map(i=>{ const p = poById(i.poId), g = gstSplit(i.lines, p.city, i.sup), s = sup(i.sup), r = reqById(p.reqId); return [iso(i.date), i.number, s.name, s.gstin, p.id, r.glCode, g.base.toFixed(2), g.cgst.toFixed(2), g.sgst.toFixed(2), g.igst.toFixed(2), g.total.toFixed(2), i.status==="paid" ? (S.payments.find(x=>x.invId===i.id)||{}).utr : ""]; });
+  const csv = [["Date","Voucher No","Party","Party GSTIN","PO","Ledger","Taxable value","CGST","SGST","IGST","Total","UTR"], ...rows].map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
+  modal(`<h3>Export for Tally / Zoho Books</h3><p class="sub" style="margin-top:6px">${rows.length} purchase vouchers. Copy and save as a .csv file, then import into Tally Prime or Zoho Books.</p><div class="field"><textarea id="csvTxt" rows="10" style="font-family:ui-monospace,monospace;font-size:12px">${esc(csv)}</textarea></div><div class="actions"><button class="btn primary" id="csvCopy">Copy CSV</button><button class="link" onclick="closeModal()">Close</button></div>`);
+  $("csvCopy").onclick = async () => { try{ await navigator.clipboard.writeText($("csvTxt").value); toast("Copied"); }catch(err){ $("csvTxt").select(); toast("Select all and copy"); } };
+});
+
+/* ================= boot ================= */
+$("resetLink").onclick = e => { e.preventDefault(); seed(); toast("Demo reset"); go(S.role); };
+seed(); render();
+(async () => { try{ sample = window.claude && window.claude.use ? await window.claude.use("sample") : null; }catch(e){ sample = null; } })();
+</script>
+</body>
+</html>
